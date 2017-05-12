@@ -49,7 +49,7 @@
     import commonDataSource from '@/components/commondatasources'
     import WorkForm from '@/components/WorkForm'
     import WorkFormDetail from '@/components/WorkFormDetail'
-
+    
     export default {
         name: 'homelayout',
         components: {
@@ -63,13 +63,13 @@
                 currentView: WorkForm,
                 opt: {},
                 menuitems: commonDataSource.WorkForm,
-                rightComponentClass:"animated bounceInDown"
+                rightComponentClass: "animated bounceInDown"
             }
         },
         methods: {
             RightComponentEvent: function(options) {
                 this.opt.data = options.data;
-                this.rightComponentClass=options.class;
+                this.rightComponentClass = options.class;
                 this.currentView = options.viewName;
                 if (options.menuitems) {
                     this.menuitems = commonDataSource[options.menuitems];
@@ -105,6 +105,10 @@
                             "viewName": "WorkForm"
                         });
                         break;
+                    case "queryWorkform":
+                        this.switchViewEvent({
+                            "viewName": "queryWorkform"
+                        });
                     default:
                         this.currentView = Home;
                 }
@@ -136,6 +140,11 @@
                         self.currentView = WorkForm;
                         self.fullscreenLoading = false;
                         self.menuitems = commonDataSource.WorkForm;
+                        break;
+                    case "queryWorkform":
+                        // self.currentView = queryWorkform;
+                        // self.fullscreenLoading = false;
+                        // self.menuitems = commonDataSource.queryWorkform;
                         break;
                     default:
                         self.fullscreenLoading = false;
@@ -203,6 +212,7 @@
         margin: 0;
         /*rgba(0,0,0,.5);*/
     }
+    
     .headerPrimaryActionsTrailing {
         list-style: none;
         margin: 0;
@@ -211,18 +221,22 @@
         text-align: right;
         text-decoration: none;
     }
+    
     .headerPrimaryActionsTrailing>li {
         display: inline-block;
     }
+    
     .menuUser,
     .menuUser>div {
         padding-right: 30px;
     }
+    
     .menuUser .menuOptions {
         height: 60px;
         line-height: 60px;
         font-size: 14px;
     }
+    
     #logoutdiv {
         float: right;
         padding-right: 10px;

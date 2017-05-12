@@ -51,5 +51,8 @@ export default {
       "menu":"  返回前页",
       "event":"switchView"
     }
+  ],
+  "queryWorkform":[
+    
   ]
 }

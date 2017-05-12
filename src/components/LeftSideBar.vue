@@ -2,14 +2,14 @@
     <div class="oneui leftSideBar">
         <h3 class="paddingBottom">工单生成</h3>
         <ul class="marginBottom">
-            <li class="paddingBottom" ><a href="/workform" v-on:click="triggerEvent">工单派工</a>
+            <li class="paddingBottom"><a href="/workform" v-on:click="triggerEvent">工单派工</a>
             </li>
         </ul>
         <h3 class="paddingBottom">汇总查询</h3>
         <ul class="marginBottom">
-            <li class="paddingBottom" id="bom-upload"><a href="#">工单查询</a>
+            <li class="paddingBottom" id="bom-upload"><a href="/queryWorkform" v-on:click="triggerEvent">工单查询</a>
             </li>
-            <li class="paddingBottom" id="bom-show"><a href="#">工时查询</a>
+            <li class="paddingBottom" id="bom-show"><a href="/queryWrokhour" v-on:click="triggerEvent">工时查询</a>
             </li>
         </ul>
         <h3 class="paddingBottom">汇总打印</h3>
@@ -55,6 +55,9 @@
                         break;
                     case "/workform":
                         this.$emit('LeftSideBarEvent', 'workform');
+                        break;
+                    case "/queryWorkform":
+                        this.$emit('LeftSideBarEvent', 'queryWorkform');
                         break;
                 }
             }
