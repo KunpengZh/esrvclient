@@ -1,6 +1,6 @@
 <template>
     <div class="homediv">
-        <h1>Welcome to Smart Supply Management</h1>
+        <h1>Welcome111 to Smart Supply Management</h1>
         <el-select placeholder="请选择" v-model="value">
             <el-option v-for="item in options" :key="item.id" :label="item.label" :value="item.value">
             </el-option>

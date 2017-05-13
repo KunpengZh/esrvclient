@@ -34,6 +34,18 @@ export default {
       "pathname":"/workItem",
       "menu":"工作任务",
       "event":"switchView"
+    },
+    {
+      "id":"0006",
+      "pathname":"/securityTools",
+      "menu":"安全工具",
+      "event":"switchView"
+    },
+    {
+      "id":"0007",
+      "pathname":"/spareParts",
+      "menu":"备品备件",
+      "event":"switchView"
     }
   ],
   "WorkForm":[
@@ -52,7 +64,5 @@ export default {
       "event":"switchView"
     }
   ],
-  "queryWorkform":[
-    
-  ]
+  "queryWorkform":[]
 }

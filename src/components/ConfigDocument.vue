@@ -12,6 +12,10 @@
                 <el-menu-item v-show="workItem" index="2" @click="handleImport()">导入工作任务</el-menu-item>
                 <el-menu-item v-show="showWorkCategory" index="1" @click="handleCreate()">新建工作类别</el-menu-item>
                 <el-menu-item v-show="showWorkCategory" index="2" @click="handleImport()">导入工作类别</el-menu-item>
+                <el-menu-item v-show="showSecurityTools" index="1" @click="handleCreate()">新建安全工具</el-menu-item>
+                <el-menu-item v-show="showSecurityTools" index="2" @click="handleImport()">导入安全工具</el-menu-item>
+                <el-menu-item v-show="showSpareParts" index="1" @click="handleCreate()">新建备品备件</el-menu-item>
+                <el-menu-item v-show="showSpareParts" index="2" @click="handleImport()">导入备品备件</el-menu-item>
             </el-menu>
         </div>
         <div style="height:700px; padding:20px;">
@@ -28,8 +32,8 @@
                 </el-table-column>
                 <el-table-column label="操作">
                     <template scope="scope">
-                                                          <el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-                                                          <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                         <el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                         <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
 </template>
                 </el-table-column>
             </el-table>
@@ -136,6 +140,8 @@
                 showlevel2: false,
                 showlevel3: false,
                 showlevel4: false,
+                showSecurityTools:false,
+                showSpareParts:false,
                 companySource: true,
                 companyAdmin: false,
                 companyEmployee: false,
@@ -172,8 +178,8 @@
                 this.createFormVisible = false;
                 this.newTextInput = "";
                 this.attr = "";
-                this.workCategory = "",
-                    this.newTextInputList = [];
+                this.workCategory = "";
+                this.newTextInputList = [];
                 this.isCreateModel = false;
                 this.isEditModel = false;
                 this.originalText = '';
@@ -269,9 +275,11 @@
                     }
                     return datasource;
                 },
-                switchView: function(viewname) {
+            switchView: function(viewname) {
                         switch (viewname) {
                             case "/companySource":
+                                this.showSecurityTools=false;
+                                this.showSpareParts=false;
                                 this.companySource = true;
                                 this.companyAdmin = false;
                                 this.companyEmployee = false;
@@ -287,6 +295,8 @@
                                 //this.companyDataSource = this.buildConfigDataSource(this.$store.state.configdoc['companySource']['data']);
                                 break;
                             case "/companyAdmin":
+                                this.showSecurityTools=false;
+                                this.showSpareParts=false;
                                 this.companySource = false;
                                 this.companyAdmin = true;
                                 this.companyEmployee = false;
@@ -302,6 +312,8 @@
                                 this.companyDataSource = this.buildConfigDataSource(this.$store.state.configdoc['companySource']['data']);
                                 break;
                             case "/companyEmployee":
+                                this.showSecurityTools=false;
+                                this.showSpareParts=false;
                                 this.companySource = false;
                                 this.companyAdmin = false;
                                 this.companyEmployee = true;
@@ -317,6 +329,8 @@
                                 this.companyDataSource = this.buildConfigDataSource(this.$store.state.configdoc['companySource']['data']);
                                 break;
                             case "/workItem":
+                                this.showSecurityTools=false;
+                                this.showSpareParts=false;
                                 this.companySource = false;
                                 this.companyAdmin = false;
                                 this.companyEmployee = false;
@@ -333,6 +347,8 @@
                                 this.workCategoryDataSource = this.buildConfigDataSource(this.$store.state.configdoc['workCategory']['data']);
                                 break;
                             case "/showWorkCategory":
+                                this.showSecurityTools=false;
+                                this.showSpareParts=false;
                                 this.companySource = false;
                                 this.companyAdmin = false;
                                 this.companyEmployee = false;
@@ -347,12 +363,48 @@
                                 this.ConfigDataSource = this.buildConfigDataSource(this.$store.state.configdoc['workCategory']['data']);
                                 //this.companyDataSource = this.buildConfigDataSource(this.$store.state.configdoc['companySource']['data']);
                                 break;
+                            case "/securityTools":
+                                this.companySource = false;
+                                this.companyAdmin = false;
+                                this.companyEmployee = false;
+                                this.workItem = false;
+                                this.showWorkCategory = false;
+                                this.showSecurityTools=true;
+                                this.showSpareParts=false;
+                                this.currentCategory = "securityTools";
+                                this.uplaodDialogTitle = "上传安全工具";
+                                this.collabel = "安全工具";
+                                this.showlevel2 = false;
+                                this.showlevel3 = false;
+                                this.showlevel4 = false;
+                                this.ConfigDataSource = this.buildConfigDataSource(this.$store.state.configdoc['securityTools']['data']);
+                                //this.companyDataSource = this.buildConfigDataSource(this.$store.state.configdoc['companySource']['data']);
+                                break;
+                            case "/spareParts":
+                                this.companySource = false;
+                                this.companyAdmin = false;
+                                this.companyEmployee = false;
+                                this.workItem = false;
+                                this.showWorkCategory = false;
+                                this.showSecurityTools=false;
+                                this.showSpareParts=true;
+                                this.currentCategory = "spareParts";
+                                this.uplaodDialogTitle = "上传备品备件";
+                                this.collabel = "备品备件";
+                                this.showlevel2 = false;
+                                this.showlevel3 = false;
+                                this.showlevel4 = false;
+                                this.ConfigDataSource = this.buildConfigDataSource(this.$store.state.configdoc['spareParts']['data']);
+                                //this.companyDataSource = this.buildConfigDataSource(this.$store.state.configdoc['companySource']['data']);
+                                break;
                             default:
                                 this.companySource = true;
                                 this.companyAdmin = false;
                                 this.companyEmployee = false;
                                 this.workItem = false;
                                 this.showWorkCategory = false;
+                                this.showSecurityTools=false;
+                                this.showSpareParts=false;
                                 this.currentCategory = "companySource";
                                 this.uplaodDialogTitle = "上传派工单位";
                                 this.collabel = "派工单位";

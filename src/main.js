@@ -25,14 +25,18 @@ const  vuex_store = new Vuex.Store({
             username:"",
             role:"",
             isAdmin:false,
-            company:""
+            company:"",
+            fullname:"",
+            isAuthenticated:false
         },
         configdoc:{
           companySource:[],
           companyAdmin:[],
           companyEmployee:[],
           workItem:[],
-          workCategory:[]
+          workCategory:[],
+          spareParts:[],
+          securityTools:[]
         }
     },
     mutations:{
@@ -54,16 +58,16 @@ new Vue({
   data: function () {
     this.$http.get('/login/isAuthenticated').then(response => {
       // success callback
-      console.log(response.body);
       var isAuthenticated = false;
       if (response.body && response.body.isAuthenticated) {
         isAuthenticated = response.body.isAuthenticated;
       }
       if (isAuthenticated) {
-        this.$store.state.curUser.username=response.body.user;
+        this.$store.state.curUser.username=response.body.username;
         this.$store.state.curUser.isAuthenticated=response.body.isAuthenticated;
         this.$store.state.curUser.role=response.body.role;
         this.$store.state.curUser.company=response.body.company;
+        this.$store.state.curUser.fullname=response.body.fullname;
         if(response.body.role==="Admin"){
           this.$store.state.curUser.isAdmin=true;
         }else{

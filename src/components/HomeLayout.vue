@@ -49,6 +49,8 @@
     import commonDataSource from '@/components/commondatasources'
     import WorkForm from '@/components/WorkForm'
     import WorkFormDetail from '@/components/WorkFormDetail'
+    import QueryWorkForm from '@/components/QueryWorkForm'
+    
     
     export default {
         name: 'homelayout',
@@ -69,11 +71,12 @@
         methods: {
             RightComponentEvent: function(options) {
                 this.opt.data = options.data;
+                this.opt.action=options.action;
                 this.rightComponentClass = options.class;
-                this.currentView = options.viewName;
                 if (options.menuitems) {
                     this.menuitems = commonDataSource[options.menuitems];
                 }
+                this.currentView = options.viewName;
             },
             LeftSideBarEvent: function(viewName) {
                 var self = this;
@@ -107,8 +110,9 @@
                         break;
                     case "queryWorkform":
                         this.switchViewEvent({
-                            "viewName": "queryWorkform"
+                            "viewName": "QueryWorkForm"
                         });
+                        break;
                     default:
                         this.currentView = Home;
                 }
@@ -141,10 +145,10 @@
                         self.fullscreenLoading = false;
                         self.menuitems = commonDataSource.WorkForm;
                         break;
-                    case "queryWorkform":
-                        // self.currentView = queryWorkform;
-                        // self.fullscreenLoading = false;
-                        // self.menuitems = commonDataSource.queryWorkform;
+                    case "QueryWorkForm":
+                        self.currentView = QueryWorkForm;
+                        self.fullscreenLoading = false;
+                        self.menuitems = commonDataSource.queryWorkform;
                         break;
                     default:
                         self.fullscreenLoading = false;

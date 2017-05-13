@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div style="height:100%; padding:20px;">
+        <div style="height:700px; padding:20px;">
             <el-table :data="WorkFormDataSource" border style="width: 100%" max-height="650">
                 <el-table-column prop="requestId" label="工单编号" label-class-name="forcastHeader">
                 </el-table-column>
@@ -16,7 +16,7 @@
                 </el-table-column>
                 <el-table-column label="操作">
                     <template scope="scope">
-                                                                                        <el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                                                 <el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
 </template>
                 </el-table-column>
             </el-table>
@@ -41,36 +41,42 @@
             <tr>
                 <td width="10%">{{request.label.company}}</td>
                 <td width="23%">
-                    <el-select :disabled="isEdithModel" filterable v-model="request.data.company">
-                        <el-option v-for="company in request.datasource.companySource" :label="company" :value="company" :key="company"></el-option>
+                    <el-select  filterable v-model="request.data.company" v-on:change="handleCompanyChange">
+                        <el-option v-for="company in request.datasource.companySource" :label="company.name" :value="company.name" :key="company.name"></el-option>
                     </el-select>
                 </td>
                 <td width="10%">{{request.label.requester}}</td>
                 <td width="22%">
-                    <el-select :disabled="isEdithModel" filterable v-model="request.data.requester" >
-                        <el-option v-for="requester in request.datasource.companyAdmin" :label="requester" :value="requester" :key="requester"></el-option>
+                    <el-select  filterable v-model="request.data.requester" >
+                        <el-option v-for="requester in request.datasource.companyAdmin" :label="requester.name" :value="requester.name" :key="requester.name"></el-option>
                     </el-select>
                 </td>
                 <td width="10%">{{request.label.creationtime}}</td>
                 <td width="25%">{{request.data.creationtime}}</td>
             </tr>
             <tr>
-                <td>{{request.label.workitem}}</td>
+                <td>{{request.label.workers}}</td>
                 <td colspan="3" style="text-align: left;">
-                    <el-select :disabled="isEdithModel" v-model="request.data.workitem">
-                        <el-option v-for="workitem in request.datasource.workItem" :label="workitem" :value="workitem" :key="workitem"></el-option>
+                    <el-select  filterable multiple v-model="request.data.workers" style="width:100%" >
+                        <el-option v-for="workers in request.datasource.companyEmployee" :label="workers.name" :value="workers.name" :key="workers.name"></el-option>
                     </el-select>
                 </td>
                 <td>{{request.label.workhour}}</td>
                 <td >
-                    {{request.data.workhour}}
+                    {{request.data.workhour.text}}
                 </td>
             </tr>
             <tr>
-                <td>{{request.label.workers}}</td>
-                <td colspan="3" style="text-align: left;">
-                    <el-select :disabled="isWorkFormClosed" filterable multiple v-model="request.data.workers" style="width:100%" >
-                        <el-option v-for="workers in request.datasource.companyEmployee" :label="workers" :value="workers" :key="workers"></el-option>
+                <td>{{request.label.workCategory}}</td>
+                 <td>
+                    <el-select  v-model="request.data.workCategory" v-on:change="handleWorkCategoryChange">
+                        <el-option v-for="workcategory in request.datasource.workCategory" :label="workcategory.name" :value="workcategory.name" :key="workcategory.name"></el-option>
+                    </el-select>
+                </td>
+                <td>{{request.label.workitem}}</td>
+                 <td>
+                    <el-select  v-model="request.data.workitem">
+                        <el-option v-for="workitem in request.datasource.workItem" :label="workitem.name" :value="workitem.name" :key="workitem.name"></el-option>
                     </el-select>
                 </td>
                 <td>{{request.label.workersnumber}}</td>
@@ -79,26 +85,25 @@
             <tr>
                 <td>{{request.label.worklocation}}</td>
                 <td colspan="3">
-                    <el-input :disabled="isWorkFormClosed" v-model="request.data.worklocation" placeholder="请输入工作地点"></el-input>
+                    <el-input  v-model="request.data.worklocation" placeholder="请输入工作地点"></el-input>
                 </td>
                 <td>{{request.label.returntime}}</td>
                 <td>
-                <el-date-picker :disabled="isWorkFormClosed || !isEdithModel" @change="calculateWorkHour"  v-model="request.data.returntime" format="yyyy-MM-dd HH:mm:ss" align="right" type="datetime" placeholder="选择返回时间">
+                <el-date-picker :disabled="true"  v-model="request.data.returntime" format="yyyy-MM-dd HH:mm:ss" align="right" type="datetime" placeholder="选择返回时间">
                 </el-date-picker>
                 </td>
             </tr>
             <tr>
             <td colspan="6">
-            <el-input type="textarea" :disabled="isWorkFormClosed" :rows="2" placeholder="工作主要内容" v-model="request.data.workcomments">
+            <el-input type="textarea"  :rows="2" placeholder="工作主要内容" v-model="request.data.workcomments">
             </el-input>
             </td>
             </tr>
             </table>
             </el-form>
         <div slot="footer" class="dialog-footer textAlignRight">
-          <el-button type="primary" @click="saveAndCreateNew()" v-show="isCreateModel">保存并创建新单</el-button>
-          <el-button type="primary" @click="saveRequestForm()" v-show="!isWorkFormClosed">保存退出</el-button>
-          <el-button type="primary" @click="completeRequestForm()" v-show="isEdithModel && !isWorkFormClosed">完成工单</el-button>
+          <el-button type="primary" @click="saveAndCreateNew()" >保存并创建新单</el-button>
+          <el-button type="primary" @click="saveRequestForm()">保存退出</el-button>
           <el-button type="warning" @click="cancel()">取 消</el-button>
         </div>
       </div>
@@ -110,14 +115,11 @@
 <script>
     export default {
         name: 'WorkForm',
+        props: ["options"],
         data() {
             return {
                 WorkFormDataSource: [],
                 dialogFormVisible: false,
-                isCreateModel: false,
-                isAlterModel: false,
-                isEdithModel: false,
-                isWorkFormClosed: false,
                 request: {
                     label: {
                         formTitle: "献县供服公司工作派工单",
@@ -126,6 +128,7 @@
                         requester: "派工人员",
                         creationtime: "派工时间",
                         workitem: "工作任务",
+                        workCategory: "任务类别",
                         worklocation: "工作地点",
                         workers: "作业人员",
                         workersnumber: "工作人数",
@@ -138,13 +141,17 @@
                         requester: "",
                         creationtime: "",
                         workitem: "",
+                        workCategory: "",
                         worklocation: "",
                         workers: [],
                         workersnumber: "",
-                        workhour: "",
+                        workhour: {
+                            text: "",
+                            minutes: 0
+                        },
                         returntime: "",
                         workcomments: "",
-                        workdocument: "",
+                        workdocument: [],
                         requestStatus: "New",
                     },
                     datasource: {
@@ -152,7 +159,11 @@
                         companyAdmin: [],
                         companyEmployee: [],
                         workItem: [],
-                        workDefine: []
+                        workCategory: []
+                    },
+                    previousValue: {
+                        company: "",
+                        workCategory: "",
                     }
                 }
             }
@@ -170,72 +181,78 @@
             }
         },
         methods: {
-            completeRequestForm: function() {
-                var self = this;
-                if (!this.validateRequestForm()) {
-                    return;
+            handleCompanyChange: function(value) {
+                if (value !== this.request.previousValue.company) {
+                    this.request.data.requester = "";
+                    this.request.data.workers = [];
+                    this.updateCompanyAdmin(value);
+                    this.updateCompanyEmployee(value);
+                    this.request.previousValue.company = value;
                 }
-                if (this.request.data.returntime === "") {
-                    this.$notify.error({
-                        title: 'Error',
-                        message: "请填写返回时间"
-                    });
-                    return;
-                }
-                this.request.data.requestStatus = "Closed";
-                this.saveRequest(function() {
-                    self.cancel();
-                });
             },
-            calculateWorkHour: function(returntime) {
-                if (returntime !== "") {
-                    var returntimestamp = Date.parse(new Date(returntime)) / 1000 / 60;
-                    var createtimestamp = Date.parse(new Date(this.request.data.creationtime)) / 1000 / 60;
-                    if (returntimestamp <= createtimestamp) {
-                        this.$notify.error({
-                            title: 'Error',
-                            message: "返回时间不能早于派工时间:" + this.request.data.creationtime
-                        });
-                        this.request.data.returntime = "";
-                        return;
-                    } else {
-                        this.request.data.workhour = Math.ceil((returntimestamp - createtimestamp) / 60);
+            updateCompanyAdmin: function(value) {
+                var source = this.$store.state.configdoc["companyAdmin"]["data"];
+                var companyAdminSource = [];
+                for (var i = 0; i < source.length; i++) {
+                    if (source[i].attr === value) {
+                        companyAdminSource.push(source[i]);
                     }
                 }
+                this.$set(this.request.datasource, "companyAdmin", companyAdminSource);
+            },
+            updateCompanyEmployee: function(value) {
+                var source = this.$store.state.configdoc["companyEmployee"]["data"];
+                var companyEmployeeSource = [];
+                for (var i = 0; i < source.length; i++) {
+                    if (source[i].attr === value) {
+                        companyEmployeeSource.push(source[i]);
+                    }
+                }
+                this.$set(this.request.datasource, "companyEmployee", companyEmployeeSource);
+            },
+            handleWorkCategoryChange: function(value) {
+                if (value !== this.request.previousValue.workCategory) {
+                    this.request.data.workitem = "";
+                    this.updateWorkItems(value);
+                    this.request.previousValue.workCategory = value;
+                }
+            },
+            updateWorkItems: function(value) {
+                var source = this.$store.state.configdoc["workItem"]["data"];
+                var workItemSource = [];
+                for (var i = 0; i < source.length; i++) {
+                    if (source[i].workCategory === value) {
+                        workItemSource.push(source[i]);
+                    }
+                }
+                this.$set(this.request.datasource, "workItem", workItemSource);
             },
             handleEdit: function(index, row) {
-                var self = this;
-                for (let key in row) {
-                    this.request.data[key] = row[key];
-                }
-                if (row.requestStatus === "Closed") {
-                    this.isWorkFormClosed = true;
-                } else {
-                    this.isWorkFormClosed = false;
-                }
-                if (this.$store.state.configdoc.companySource.length <= 0) {
-                    this.loadConfigData(function() {
-                        self.request.datasource.companySource = self.$store.state.configdoc["companySource"]["data"];
-                        self.request.datasource.companyAdmin = self.$store.state.configdoc["companyAdmin"]["data"];
-                        self.request.datasource.companyEmployee = self.$store.state.configdoc["companyEmployee"]["data"];
-                        self.request.datasource.workItem = self.$store.state.configdoc["workItem"]["data"];
-                        self.request.datasource.workDefine = self.$store.state.configdoc["workDefine"]["data"];
-                        self.dialogFormVisible = true;
-                        self.isEdithModel = true;
-                    })
-                } else {
-                    if (this.request.datasource.companySource.length <= 0) {
-                        this.request.datasource.companySource = this.$store.state.configdoc["companySource"]["data"];
-                        this.request.datasource.companyAdmin = this.$store.state.configdoc["companyAdmin"]["data"];
-                        this.request.datasource.companyEmployee = this.$store.state.configdoc["companyEmployee"]["data"];
-                        this.request.datasource.workItem = this.$store.state.configdoc["workItem"]["data"];
-                        this.request.datasource.workDefine = this.$store.state.configdoc["workDefine"]["data"];
-                    }
-                    this.dialogFormVisible = true;
-                    this.isEdithModel = true;
-                }
+                this.$emit('RightComponentEvent', {
+                    data: row,
+                    viewName: "WorkFormDetail",
+                    class: "animated bounceInRight",
+                    menuitems: "WorkFormDetail"
+                });
             },
-            saveAndCreateNew: function(index, row) {},
+            saveAndCreateNew: function(index, row) {
+                var self = this;
+                this.saveRequest(function() {
+                    self.restoreRequestStatus();
+                    self.$http.get('/workformapi/requestid').then(function(res) {
+                        var strbody = res.body;
+                        if (!strbody.requestId || !strbody.strtime) {
+                            this.$notify.error({
+                                title: 'Error',
+                                message: "未能从服务器取得派工单编号"
+                            });
+                            return;
+                        }
+                        self.request.data.creationtime = strbody.strtime;
+                        self.request.data.requestId = strbody.requestId;
+                    })
+                })
+            },
             saveRequestForm: function() {
                 var self = this;
                 this.saveRequest(function() {
@@ -256,22 +273,11 @@
                             message: "保存成功"
                         });
                         var tsource = this.WorkFormDataSource;
-                        if (this.isCreateModel) {
-                            tsource.push(res.body);
-                            this.$set(this.WorkFormDataSource, tsource);
-                        } else if (this.isEdithModel) {
-                            for (let i = 0; i < tsource.length; i++) {
-                                if (tsource[i]._id === res.body._id) {
-                                    //tsource= tsource.splice(i,1);
-                                    this.$set(this.WorkFormDataSource, i, res.body);
-                                }
-                            }
-                        }
+                        tsource.push(res.body);
+                        this.$set(this.WorkFormDataSource, tsource);
                         if (callback) {
                             callback();
                         }
-                        // tsource.push(res.body);
-                        // this.$set(this.WorkFormDataSource, tsource);
                     } else {
                         this.$notify.error({
                             title: 'Error',
@@ -286,10 +292,13 @@
                     this.request.data[key] = '';
                 }
                 this.request.data.requestStatus = "New";
-                this.isCreateModel = false;
-                this.isAlterModel = false;
-                this.isEdithModel = false;
-                this.isWorkFormClosed = false;
+                this.request.data.workhour = {
+                    text: "",
+                    minutes: 0
+                }
+                this.request.datasource.companyAdmin = [];
+                this.request.datasource.companyEmployee = [];
+                this.request.datasource.workItem=[];
             },
             cancel: function() {
                 this.dialogFormVisible = false;
@@ -314,16 +323,15 @@
                             self.request.data.creationtime = strbody.strtime;
                             self.request.data.requestId = strbody.requestId;
                             self.dialogFormVisible = true;
-                            self.isCreateModel = true;
                         })
                     })
                 } else {
                     if (this.request.datasource.companySource.length <= 0) {
                         this.request.datasource.companySource = this.$store.state.configdoc["companySource"]["data"];
-                        this.request.datasource.companyAdmin = this.$store.state.configdoc["companyAdmin"]["data"];
-                        this.request.datasource.companyEmployee = this.$store.state.configdoc["companyEmployee"]["data"];
-                        this.request.datasource.workItem = this.$store.state.configdoc["workItem"]["data"];
-                        this.request.datasource.workDefine = this.$store.state.configdoc["workDefine"]["data"];
+                        //this.request.datasource.companyAdmin = this.$store.state.configdoc["companyAdmin"]["data"];
+                        //this.request.datasource.companyEmployee = this.$store.state.configdoc["companyEmployee"]["data"];
+                        //this.request.datasource.workItem = this.$store.state.configdoc["workItem"]["data"];
+                        this.request.datasource.workCategory = this.$store.state.configdoc["workCategory"]["data"];
                     }
                     self.$http.get('/workformapi/requestid').then(function(res) {
                         var strbody = res.body;
@@ -337,7 +345,6 @@
                         self.request.data.creationtime = strbody.strtime;
                         self.request.data.requestId = strbody.requestId;
                         self.dialogFormVisible = true;
-                        self.isCreateModel = true;
                     })
                 }
             },
@@ -349,10 +356,10 @@
                         this.$store.state.configdoc[key] = docList[i]
                     }
                     this.request.datasource.companySource = this.$store.state.configdoc["companySource"]["data"];
-                    this.request.datasource.companyAdmin = this.$store.state.configdoc["companyAdmin"]["data"];
-                    this.request.datasource.companyEmployee = this.$store.state.configdoc["companyEmployee"]["data"];
-                    this.request.datasource.workItem = this.$store.state.configdoc["workItem"]["data"];
-                    this.request.datasource.workDefine = this.$store.state.configdoc["workDefine"]["data"];
+                    //this.request.datasource.companyAdmin = this.$store.state.configdoc["companyAdmin"]["data"];
+                    //this.request.datasource.companyEmployee = this.$store.state.configdoc["companyEmployee"]["data"];
+                    //this.request.datasource.workItem = this.$store.state.configdoc["workItem"]["data"];
+                    this.request.datasource.workCategory = this.$store.state.configdoc["workCategory"]["data"];
                     if (callback) {
                         callback();
                     }
@@ -394,18 +401,25 @@
                     });
                     return false;
                 }
-                var returntime = this.request.data.returntime;
-                if (returntime !== "") {
-                    var returntimestamp = Date.parse(new Date(returntime)) / 1000 / 60;
-                    var createtimestamp = Date.parse(new Date(this.request.data.creationtime)) / 1000 / 60;
-                    if (returntimestamp <= createtimestamp) {
-                        this.$notify.error({
-                            title: 'Error',
-                            message: "返回时间不能早于派工时间"
-                        });
-                        return false;
-                    }
+                if (this.request.data.workCategory==="") {
+                    this.$notify.error({
+                        title: 'Error',
+                        message: "任务类别不能为空"
+                    });
+                    return false;
                 }
+                // var returntime = this.request.data.returntime;
+                // if (returntime !== "") {
+                //     var returntimestamp = Date.parse(new Date(returntime)) / 1000 / 60;
+                //     var createtimestamp = Date.parse(new Date(this.request.data.creationtime)) / 1000 / 60;
+                //     if (returntimestamp <= createtimestamp) {
+                //         this.$notify.error({
+                //             title: 'Error',
+                //             message: "返回时间不能早于派工时间"
+                //         });
+                //         return false;
+                //     }
+                // }
                 return true;
             }
         }
@@ -419,17 +433,24 @@
         margin-bottom: 20px;
         width: 500px;
     }
+    
     .forcastHeader {
         font-size: 14px;
         font-weight: normal;
     }
+    
     #formdialog {
-        top: 15%;
+        top: 10%;
         width: 950px;
         height: 550px;
     }
+    
+    
     /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+    
+    
     /*the CSS Style for  Table*/
+    
     .bordered {
         margin-top: 3px;
         margin-bottom: 15px;
@@ -441,6 +462,7 @@
         /*border: solid #ccc 1px;*/
         background-color: #ffffff;
     }
+    
     .bordered tr:hover {
         background: #fbf8e9;
         -o-transition: all 0.1s ease-in-out;
@@ -449,6 +471,7 @@
         -ms-transition: all 0.1s ease-in-out;
         transition: all 0.1s ease-in-out;
     }
+    
     .bordered td,
     .bordered th {
         border-left: 1px solid #ccc;
@@ -459,9 +482,12 @@
         padding-bottom: 10px;
         text-align: center;
     }
+    
     .bordered td:first-child,
     .bordered th:first-child {
         border-left: none;
     }
+    
+    
     /*End the CSS Style for Table*/
 </style>

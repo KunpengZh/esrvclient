@@ -16,7 +16,7 @@
                 <tr>
                     <td width="10%">{{request.label.company}}</td>
                     <td width="23%">
-                        <el-select :disabled="isEdithModel" filterable v-model="request.data.company">
+                        <el-select :disabled="isEdithModel || isCreateModel" filterable v-model="request.data.company" v-on:change="handleCompanyChange">
                             <el-option v-for="company in request.datasource.companySource" :label="company.name" :value="company.name" :key="company.name"></el-option>
                         </el-select>
                     </td>
@@ -31,20 +31,25 @@
                 </tr>
                 <tr>
                     <td>{{request.label.workers}}</td>
-                    <td colspan="3" style="text-align: left;">
+                    <td style="text-align: left;">
                         <el-select :disabled="isEdithModel" filterable multiple v-model="request.data.workers" style="width:100%">
                             <el-option v-for="workers in request.datasource.companyEmployee" :label="workers.name" :value="workers.name" :key="workers.name"></el-option>
                         </el-select>
                     </td>
                     <td>{{request.label.workhour}}</td>
                     <td>
-                        {{request.data.workhour.text}}
+                        <el-input :disabled="isCreateModel" v-model="request.data.workhour" placeholder="请输入工作小时数" style="width:80%" v-on:change="handleWorkhourInput"></el-input>
+                    </td>
+                    <td>{{request.label.planreturntime}}</td>
+                    <td>
+                        <el-date-picker :disabled="isEdithModel" v-model="request.data.planreturntime" format="yyyy-MM-dd HH:mm:ss" align="right" type="datetime" placeholder="选择实际返回时间">
+                        </el-date-picker>
                     </td>
                 </tr>
                 <tr>
                     <td>{{request.label.workCategory}}</td>
                     <td>
-                        <el-select :disabled="isEdithModel" v-model="request.data.workCategory">
+                        <el-select :disabled="isEdithModel" v-model="request.data.workCategory" v-on:change="handleWorkCategoryChange">
                             <el-option v-for="workcategory in request.datasource.workCategory" :label="workcategory.name" :value="workcategory.name" :key="workcategory.name"></el-option>
                         </el-select>
                     </td>
@@ -56,6 +61,48 @@
                     </td>
                     <td>{{request.label.workersnumber}}</td>
                     <td>{{workersnumber}}</td>
+                </tr>
+                <td>{{request.label.isSecurityTools}}</td>
+                <td>
+                    <template>
+                        <el-radio-group v-model="request.data.isSecurityTools" v-on:change="handleSecurityToolsChange">
+                                <el-radio :disabled="isEdithModel" class="radio"   label="Yes">是</el-radio>
+                                <el-radio :disabled="isEdithModel" class="radio"   label="No">否</el-radio>
+                        </el-radio-group>
+                    </template>
+                </td>
+                <td>{{request.label.isSpareParts}}</td>
+                <td>
+                    <template>
+                        <el-radio-group v-model="request.data.isSpareParts" v-on:change="handleSparePartsChange">
+                            <el-radio :disabled="isEdithModel" class="radio" label="Yes">是</el-radio>
+                            <el-radio :disabled="isEdithModel" class="radio" label="No">否</el-radio>
+                        </el-radio-group>
+                    </template>
+                </td>
+                <td>{{request.label.sanPiaoZhiXing}}</td>
+                <td>
+                    <template>
+                        <el-radio :disabled="isEdithModel" class="radio" v-model="request.data.sanPiaoZhiXing" label="是">
+                            是</el-radio>
+                        <el-radio :disabled="isEdithModel" class="radio" v-model="request.data.sanPiaoZhiXing" label="否">否</el-radio>
+                    </template>
+                </td>
+                <tr>
+                </tr>
+                <tr>
+                <td>{{request.label.securityTools}}</td>
+                <td>
+                    <el-select :disabled="isEdithModel || lockSecurityTools" filterable multiple v-model="request.data.securityTools" style="width:100%">
+                            <el-option v-for="tool in request.datasource.securityTools" :label="tool.name" :value="tool.name" :key="tool.name"></el-option>
+                    </el-select>
+                </td>
+                <td>{{request.label.spareParts}}</td>
+                <td colspan="3">
+                    <el-select :disabled="isEdithModel || lockSpareParts" filterable multiple v-model="request.data.spareParts" style="width:100%">
+                            <el-option v-for="part in request.datasource.spareParts" :label="part.name" :value="part.name" :key="part.name"></el-option>
+                    </el-select>
+                </td>
                 </tr>
                 <tr>
                     <td>{{request.label.worklocation}}</td>
@@ -78,10 +125,11 @@
         </el-form>
         <el-row class="textAlignRight">
             <el-col :span="24">
-                <el-button type="primary" @click="showUploadDialog()" v-show="!isWorkFormClosed">上传照片</el-button>
-                <el-button type="primary" @click="saveRequest()" v-show="!isWorkFormClosed">保存退出</el-button>
+                <el-button type="primary" @click="saveAndCreateNew()" v-show="isCreateModel">保存并创建新单</el-button>
+                <el-button type="primary" @click="showUploadDialog()" v-show="isEdithModel && !isWorkFormClosed">上传照片</el-button>
+                <el-button type="primary" @click="saveRequest()" v-show="isCreateModel || (isEdithModel && !isWorkFormClosed)">保存退出</el-button>
                 <el-button type="primary" @click="completeRequestForm()" v-show="isEdithModel && !isWorkFormClosed">完成工单</el-button>
-                <el-button type="warning" @click="returnData()" v-show="!isWorkFormClosed">取 消</el-button>
+                <el-button type="warning" @click="returnData()" v-show="isCreateModel || (isEdithModel && !isWorkFormClosed)">取 消</el-button>
             </el-col>
         </el-row>
         <el-row style="border:1px solid #ccc; margin-top:10px;">
@@ -132,9 +180,13 @@
         data() {
             return {
                 isWorkFormClosed: false,
-                isEdithModel: true,
+                isEdithModel: false,
                 dialogFormVisible: false,
+                action: this.options.action,
+                isCreateModel: false,
                 uplaodDialogTitle: "上传现场照片",
+                lockSecurityTools: true,
+                lockSpareParts: true,
                 request: {
                     label: {
                         formTitle: "献县供服公司工作派工单",
@@ -147,8 +199,14 @@
                         worklocation: "工作地点",
                         workers: "作业人员",
                         workersnumber: "工作人数",
-                        workhour: "工时",
-                        returntime: "返回时间"
+                        workhour: "工作数量",
+                        returntime: "实际返回时间",
+                        planreturntime: "计划返回时间",
+                        isSecurityTools: "领取安全工具",
+                        isSpareParts: "领取备品备件",
+                        securityTools: "安全工具",
+                        spareParts: "备品备件",
+                        sanPiaoZhiXing: "三票执行"
                     },
                     data: this.options.data,
                     datasource: {
@@ -156,7 +214,13 @@
                         companyAdmin: [],
                         companyEmployee: [],
                         workItem: [],
-                        workCategory: []
+                        workCategory: [],
+                        securityTools: [],
+                        spareParts: []
+                    },
+                    previousValue: {
+                        company: "",
+                        workCategory: "",
                     }
                 },
                 workdocuments: [],
@@ -166,32 +230,12 @@
         mounted: function() {
             this.$nextTick(function() {
                 var self = this;
-                if (this.request.data.requestStatus === "Closed") {
-                    this.isWorkFormClosed = true;
+                if (!this.$store.state.curUser.isAuthenticated) {
+                    this.getCureUser(this.initialstatus);
                 } else {
-                    this.isWorkFormClosed = false;
+                    this.initialstatus();
                 }
-                if (this.$store.state.configdoc.companySource.length <= 0) {
-                    this.loadConfigData(function() {
-                        
-                        self.request.datasource.companySource = self.$store.state.configdoc["companySource"]["data"];
-                        self.request.datasource.companyAdmin = self.$store.state.configdoc["companyAdmin"]["data"];
-                        self.request.datasource.companyEmployee = self.$store.state.configdoc["companyEmployee"]["data"];
-                        self.request.datasource.workItem = self.$store.state.configdoc["workItem"]["data"];
-                        self.request.datasource.workCategory = self.$store.state.configdoc["workCategory"]["data"];
-                        self.isEdithModel = true;
-                    })
-                } else {
-                    if (this.request.datasource.companySource.length <= 0) {
-                        this.request.datasource.companySource = this.$store.state.configdoc["companySource"]["data"];
-                        this.request.datasource.companyAdmin = this.$store.state.configdoc["companyAdmin"]["data"];
-                        this.request.datasource.companyEmployee = this.$store.state.configdoc["companyEmployee"]["data"];
-                        this.request.datasource.workItem = this.$store.state.configdoc["workItem"]["data"];
-                        this.request.datasource.workCategory = this.$store.state.configdoc["workCategory"]["data"];
-                    }
-                    this.isEdithModel = true;
-                }
-                this.calculateWorkDocuments(this.request.data.workdocument);
+    
             })
         },
         computed: {
@@ -200,6 +244,163 @@
             },
         },
         methods: {
+            initialstatus: function() {
+                var self = this;
+                if (this.$store.state.configdoc.companySource.length <= 0) {
+                    this.loadConfigData(function() {
+                        self.request.datasource.companySource = self.$store.state.configdoc["companySource"]["data"];
+                        // self.request.datasource.companyAdmin = self.$store.state.configdoc["companyAdmin"]["data"];
+                        // self.request.datasource.companyEmployee = self.$store.state.configdoc["companyEmployee"]["data"];
+                        // self.request.datasource.workItem = self.$store.state.configdoc["workItem"]["data"];
+                        self.request.datasource.workCategory = self.$store.state.configdoc["workCategory"]["data"];
+                        self.request.datasource.securityTools = self.$store.state.configdoc["securityTools"]["data"];
+                        self.request.datasource.spareParts = self.$store.state.configdoc["spareParts"]["data"];
+                        self.initialRequestData();
+                    })
+                } else {
+                    if (this.request.datasource.companySource.length <= 0) {
+                        this.request.datasource.companySource = this.$store.state.configdoc["companySource"]["data"];
+                        // this.request.datasource.companyAdmin = this.$store.state.configdoc["companyAdmin"]["data"];
+                        // this.request.datasource.companyEmployee = this.$store.state.configdoc["companyEmployee"]["data"];
+                        // this.request.datasource.workItem = this.$store.state.configdoc["workItem"]["data"];
+                        self.request.datasource.securityTools = self.$store.state.configdoc["securityTools"]["data"];
+                        self.request.datasource.spareParts = self.$store.state.configdoc["spareParts"]["data"];
+                        this.request.datasource.workCategory = this.$store.state.configdoc["workCategory"]["data"];
+                    }
+                    self.initialRequestData();
+                }
+            },
+            initialRequestData: function() {
+                var self = this;
+                if (self.action === "Edit") {
+                    self.isCreateModel = false;
+                    self.isEdithModel = true;
+                    if (self.request.data.requestStatus === "Closed") {
+                        self.isWorkFormClosed = true;
+                    } else {
+                        self.isWorkFormClosed = false;
+                    }
+                    self.calculateWorkDocuments(self.request.data.workdocument);
+                } else {
+                    self.isCreateModel = true;
+                    self.isWorkFormClosed = false;
+                    self.isEdithModel = false;
+    
+                    self.request.data.company = self.$store.state.curUser.company;
+                    self.request.data.requester = self.$store.state.curUser.fullname;
+                    self.handleCompanyChange(self.request.data.company);
+                }
+    
+                if (self.isCreateModel) {
+                    self.$http.get('/workformapi/requestid').then(function(res) {
+                        var strbody = res.body;
+                        if (!strbody.requestId || !strbody.strtime) {
+                            self.$notify.error({
+                                title: 'Error',
+                                message: "未能从服务器取得派工单编号"
+                            });
+                            return;
+                        }
+                        self.request.data.creationtime = strbody.strtime;
+                        self.request.data.requestId = strbody.requestId;
+                    })
+                }
+            },
+            getCureUser: function(callback) {
+                self.$http.get('/login/isAuthenticated').then(response => {
+                    var isAuthenticated = false;
+                    if (response.body && response.body.isAuthenticated) {
+                        isAuthenticated = response.body.isAuthenticated;
+                    }
+                    if (isAuthenticated) {
+                        self.$store.state.curUser.username = response.body.username;
+                        self.$store.state.curUser.isAuthenticated = response.body.isAuthenticated;
+                        self.$store.state.curUser.role = response.body.role;
+                        self.$store.state.curUser.company = response.body.company;
+                        this.$store.state.curUser.fullname=response.body.fullname;
+                        if (response.body.role === "Admin") {
+                            self.$store.state.curUser.isAdmin = true;
+                        } else {
+                            self.$store.state.curUser.isAdmin = false;
+                        }
+                    }
+                    if (callback) {
+                        callback();
+                    }
+                })
+            },
+            handleSecurityToolsChange: function(value) {
+                if (value === "Yes") {
+                    this.lockSecurityTools = false;
+                } else {
+                    this.lockSecurityTools = true;
+                    this.request.data.securityTools = [];
+                }
+            },
+            handleSparePartsChange: function(value) {
+                if (value === "Yes") {
+                    this.lockSpareParts = false;
+                } else {
+                    this.lockSpareParts = true;
+                    this.request.data.spareParts = [];
+                }
+            },
+            handleWorkhourInput: function(value) {
+                if (isNaN(value)) {
+                    this.$notify.error({
+                        title: 'Error',
+                        message: "只能输入数字"
+                    });
+                }
+            },
+            handleCompanyChange: function(value) {
+                var self=this;
+                if (value !== this.request.previousValue.company) {
+                    //this.request.data.requester = "";
+                    self.request.data.requester = self.$store.state.curUser.fullname;
+                    self.request.data.workers = [];
+                    self.updateCompanyAdmin(value);
+                    self.updateCompanyEmployee(value);
+                    self.request.previousValue.company = value;
+                }
+            },
+            updateCompanyAdmin: function(value) {
+                var source = this.$store.state.configdoc["companyAdmin"]["data"];
+                var companyAdminSource = [];
+                for (var i = 0; i < source.length; i++) {
+                    if (source[i].attr === value) {
+                        companyAdminSource.push(source[i]);
+                    }
+                }
+                this.$set(this.request.datasource, "companyAdmin", companyAdminSource);
+            },
+            updateCompanyEmployee: function(value) {
+                var source = this.$store.state.configdoc["companyEmployee"]["data"];
+                var companyEmployeeSource = [];
+                for (var i = 0; i < source.length; i++) {
+                    if (source[i].attr === value) {
+                        companyEmployeeSource.push(source[i]);
+                    }
+                }
+                this.$set(this.request.datasource, "companyEmployee", companyEmployeeSource);
+            },
+            handleWorkCategoryChange: function(value) {
+                if (value !== this.request.previousValue.workCategory) {
+                    this.request.data.workitem = "";
+                    this.updateWorkItems(value);
+                    this.request.previousValue.workCategory = value;
+                }
+            },
+            updateWorkItems: function(value) {
+                var source = this.$store.state.configdoc["workItem"]["data"];
+                var workItemSource = [];
+                for (var i = 0; i < source.length; i++) {
+                    if (source[i].workCategory === value) {
+                        workItemSource.push(source[i]);
+                    }
+                }
+                this.$set(this.request.datasource, "workItem", workItemSource);
+            },
             showUploadDialog: function() {
                 this.dialogFormVisible = true
             },
@@ -231,10 +432,70 @@
                         return;
                     } else {
                         //this.request.data.workhour = Math.ceil((returntimestamp - createtimestamp) / 60);
-                        this.request.data.workhour.text = Math.floor((returntimestamp - createtimestamp) / 60) + "小时 " + ((returntimestamp - createtimestamp) % 60) + "分钟";
-                        this.request.data.workhour.minutes = returntimestamp - createtimestamp;
+                        // this.request.data.workhour.text = Math.floor((returntimestamp - createtimestamp) / 60) + "小时 " + ((returntimestamp - createtimestamp) % 60) + "分钟";
+                        // this.request.data.workhour.minutes = returntimestamp - createtimestamp;
                     }
                 }
+            },
+            saveAndCreateNew: function() {
+                var self = this;
+                this.request.data.workersnumber = this.workersnumber;
+                if (!this.validateRequestForm()) {
+                    return;
+                }
+                this.$http.post("/workformapi/save", {
+                    data: this.request.data
+                }).then(function(res) {
+                    if (res.status === 200 && res.body.requestId) {
+                        this.$notify.info({
+                            title: '保存成功',
+                            message: "保存成功"
+                        });
+                        self.request.data = {
+                            requestId: "",
+                            company: "",
+                            requester: "",
+                            creationtime: "",
+                            workitem: "",
+                            workCategory: "",
+                            worklocation: "",
+                            workers: [],
+                            workersnumber: "",
+                            workhour: "",
+                            planreturntime: "",
+                            returntime: "",
+                            workcomments: "",
+                            workdocument: [],
+                            requestStatus: "New",
+                            securityTools: [],
+                            spareParts: [],
+                            isSpareParts: "",
+                            isSecurityTools: "",
+                            sanPiaoZhiXing: ""
+                        }
+                        this.request.datasource.companyAdmin = [];
+                        this.request.datasource.companyEmployee = [];
+                        this.request.datasource.workItem = [];
+                        self.$http.get('/workformapi/requestid').then(function(res) {
+                            var strbody = res.body;
+                            if (!strbody.requestId || !strbody.strtime) {
+                                this.$notify.error({
+                                    title: 'Error',
+                                    message: "未能从服务器取得派工单编号"
+                                });
+                                return;
+                            }
+                            self.request.data.creationtime = strbody.strtime;
+                            self.request.data.requestId = strbody.requestId;
+                        })
+                    } else {
+                        this.$notify.error({
+                            title: 'Error',
+                            message: res.body
+                        });
+                        return;
+                    }
+                });
             },
             saveRequest: function() {
                 var self = this;
@@ -319,23 +580,44 @@
                     });
                     return false;
                 }
-                if (this.request.data.workCategory==="") {
+                if (this.request.data.workCategory === "") {
                     this.$notify.error({
                         title: 'Error',
                         message: "任务类别不能为空"
                     });
                     return false;
                 }
-                var returntime = this.request.data.returntime;
-                if (returntime !== "") {
-                    var returntimestamp = Date.parse(new Date(returntime)) / 1000 / 60;
+                if (this.request.data.planreturntime === "") {
+                    this.$notify.error({
+                        title: 'Error',
+                        message: "计划返回时间不能为空"
+                    });
+                    return false;
+                }
+                if (this.isCreateModel) {
+                    var planreturntime = this.request.data.planreturntime;
+                    var planreturntimestamp = Date.parse(new Date(planreturntime)) / 1000 / 60;
                     var createtimestamp = Date.parse(new Date(this.request.data.creationtime)) / 1000 / 60;
-                    if (returntimestamp <= createtimestamp) {
+                    if (planreturntimestamp <= createtimestamp) {
                         this.$notify.error({
                             title: 'Error',
-                            message: "返回时间不能早于派工时间"
+                            message: "计划返回时间不能早于派工时间"
                         });
                         return false;
+                    }
+                }
+                if (this.isEdithModel) {
+                    var returntime = this.request.data.returntime;
+                    if (returntime !== "") {
+                        var returntimestamp = Date.parse(new Date(returntime)) / 1000 / 60;
+                        var createtimestamp = Date.parse(new Date(this.request.data.creationtime)) / 1000 / 60;
+                        if (returntimestamp <= createtimestamp) {
+                            this.$notify.error({
+                                title: 'Error',
+                                message: "返回时间不能早于派工时间"
+                            });
+                            return false;
+                        }
                     }
                 }
                 return true;

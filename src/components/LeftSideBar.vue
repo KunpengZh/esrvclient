@@ -9,8 +9,6 @@
         <ul class="marginBottom">
             <li class="paddingBottom" id="bom-upload"><a href="/queryWorkform" v-on:click="triggerEvent">工单查询</a>
             </li>
-            <li class="paddingBottom" id="bom-show"><a href="/queryWrokhour" v-on:click="triggerEvent">工时查询</a>
-            </li>
         </ul>
         <h3 class="paddingBottom">汇总打印</h3>
         <ul class="marginBottom">

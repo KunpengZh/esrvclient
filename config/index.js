@@ -33,7 +33,8 @@ module.exports = {
       '/login': 'http://localhost',
       '/logout': 'http://localhost',
       '/workform': 'http://localhost',
-      '/workforms':'http://localhost'
+      '/workforms':'http://localhost',
+      '/queryWorkForm':'http://localhost'
     },
     // CSS Sourcemaps off by default because relative paths are "buggy"
     // with this option, according to the CSS-Loader README

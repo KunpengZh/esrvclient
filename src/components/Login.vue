@@ -57,9 +57,11 @@ export default {
             let options = { emulateJSON: true };
             this.$http.post("/login",{"username":this.username,"password":this.password},options).then(function(response) {
                if(response.body && response.body.isAuthenticated){
-                    this.$store.state.curUser.username=response.body.user;
+                    this.$store.state.curUser.username=response.body.username;
                     this.$store.state.curUser.isAuthenticated=response.body.isAuthenticated;
                     this.$store.state.curUser.role=response.body.role;
+                    this.$store.state.curUser.fullname=response.body.fullname;
+                    this.$store.state.curUser.company=response.body.company;
                     if(response.body.role==="Admin"){
                         this.$store.state.curUser.isAdmin=true;
                     }else{
