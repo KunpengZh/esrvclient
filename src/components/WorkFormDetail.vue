@@ -83,9 +83,10 @@
                 <td>{{request.label.sanPiaoZhiXing}}</td>
                 <td>
                     <template>
-                        <el-radio :disabled="isEdithModel" class="radio" v-model="request.data.sanPiaoZhiXing" label="是">
-                            是</el-radio>
-                        <el-radio :disabled="isEdithModel" class="radio" v-model="request.data.sanPiaoZhiXing" label="否">否</el-radio>
+                    <el-radio-group v-model="request.data.sanPiaoZhiXing">
+                        <el-radio :disabled="isEdithModel" class="radio" label="Yes">是</el-radio>
+                        <el-radio :disabled="isEdithModel" class="radio" label="No">否</el-radio>
+                    </el-radio-group>
                     </template>
                 </td>
                 <tr>
@@ -125,6 +126,7 @@
         </el-form>
         <el-row class="textAlignRight">
             <el-col :span="24">
+                <el-button type="primary" @click="pringWorkForm()">打印预览</el-button>
                 <el-button type="primary" @click="saveAndCreateNew()" v-show="isCreateModel">保存并创建新单</el-button>
                 <el-button type="primary" @click="showUploadDialog()" v-show="isEdithModel && !isWorkFormClosed">上传照片</el-button>
                 <el-button type="primary" @click="saveRequest()" v-show="isCreateModel || (isEdithModel && !isWorkFormClosed)">保存退出</el-button>
@@ -179,6 +181,7 @@
         props: ["options"],
         data() {
             return {
+                previousView:this.options.previousView,
                 isWorkFormClosed: false,
                 isEdithModel: false,
                 dialogFormVisible: false,
@@ -522,12 +525,14 @@
                 });
             },
             returnData: function(data) {
-                this.$emit('RightComponentEvent', {
+                var returnOpt={
                     data: data,
-                    viewName: "WorkForm",
+                    viewName: this.previousView,
                     class: "animated bounceInLeft",
-                    menuitems: "WorkForm"
-                });
+                    menuitems: "WorkForm",
+                    previousView:"WorkFormDetail"
+                };
+                this.$emit('RightComponentEvent',returnOpt );
             },
             loadConfigData: function(callback) {
                 this.$http.get('/esrvapi/getallconfigdoc').then(function(res) {
@@ -680,6 +685,19 @@
                     requestId: this.request.data.requestId,
                     description: this.picdescription
                 }
+            },
+            pringWorkForm:function(){
+                if(window.sessionStorage){
+                    sessionStorage.setItem("ToPrintWorkFormData",JSON.stringify(this.request));
+                    var path=window.location.protocol+"//"+window.location.host+"/printWorkForm";
+                    window.open(path);  
+                }else{
+                    this.$notify.error({
+                        title: 'Error',
+                        message: "你的浏览器不支持此功能，请升级"
+                    });
+                    return;
+                } 
             }
         }
     }

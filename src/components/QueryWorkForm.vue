@@ -38,7 +38,28 @@
             <el-col :span="24">
                 <el-button type="primary" @click="queryWorkForm">按所选条件查询</el-button>
             </el-col>
-        </el-row>
+            </el-row>
+        </div>
+         <div style="height:700px; padding:20px;">
+            <el-table :data="WorkFormDataSource" border style="width: 100%" max-height="650">
+                <el-table-column prop="requestId" label="工单编号" label-class-name="forcastHeader">
+                </el-table-column>
+                <el-table-column prop="company" label="派工单位" label-class-name="forcastHeader">
+                </el-table-column>
+                <el-table-column prop="requester" label="派工人员" label-class-name="forcastHeader">
+                </el-table-column>
+                <el-table-column prop="creationtime" label="派工时间" label-class-name="forcastHeader">
+                </el-table-column>
+                <el-table-column prop="returntime" label="返回时间" label-class-name="forcastHeader">
+                </el-table-column>
+                <el-table-column prop="workitem" label="工作任务" label-class-name="forcastHeader">
+                </el-table-column>
+                <el-table-column label="操作">
+                    <template scope="scope">
+                                     <el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+</template>
+                </el-table-column>
+            </el-table>
         </div>
     </div>
 </template>
@@ -48,6 +69,7 @@
         name: 'QueryWorkHome',
         data: function() {
             return {
+                WorkFormDataSource:[],
                 fullscreenLoading: false,
                 isAdmin: false,
                 query: {
@@ -110,7 +132,6 @@
                     var needworks=true;
                     var workers=this.query.criteria.workers;
                     for(var i=0;i<workers.length;i++){
-                        console.log(workers[i].name);
                         if(workers[i]==="All"){
                             needworks=false;
                             break;
@@ -128,10 +149,15 @@
                     qcriteria.returntime=this.query.criteria.returntime;
                 }
 
-                this.$http.post("/queryWorkForm", {data:qcriteria}).then(function(res){
-                    console.log(res.body);
-                })
+               this.queryData(qcriteria);
 
+            },
+            queryData:function(qcriteria){
+                var self=this;
+                this.$store.state.qcriteria=qcriteria;
+                this.$http.post("/queryWorkForm", {data:qcriteria}).then(function(res){
+                    self.WorkFormDataSource=res.body;
+                })
             },
             getCureUser: function(callback) {
                 self.$http.get('/login/isAuthenticated').then(response => {
@@ -228,10 +254,26 @@
                     }
                 })
             },
+            setInitialCriteria:function(){
+                var self=this;
+                var  criteria= {
+                            requestId: self.$store.state.qcriteria.requestId?self.$store.state.qcriteria.requestId:"",
+                            company: self.$store.state.qcriteria.company?self.$store.state.qcriteria.company:"",
+                            creationtime: self.$store.state.qcriteria.creationtime?self.$store.state.qcriteria.creationtime:"",
+                            workers: self.$store.state.qcriteria.workers?self.$store.state.qcriteria.workers:[],
+                            workCategory: self.$store.state.qcriteria.workCategory?self.$store.state.qcriteria.workCategory:"",
+                            returntime: self.$store.state.qcriteria.returntime?self.$store.state.qcriteria.returntime:""
+                        };
+                     self.query.criteria=criteria;
+                     self.queryWorkForm();
+            },
             initialRequestData: function() {
                 var self = this;
                 self.query.criteria.company = self.$store.state.curUser.company
                 self.handleCompanyChange(self.query.criteria.company);
+                if(self.$store.state.qcriteria!==""){
+                    self.setInitialCriteria();
+                }
     
             },
             handleCompanyChange: function(value) {
@@ -254,6 +296,16 @@
                 }
                 this.$set(this.query.datasource, "companyEmployee", companyEmployeeSource);
             },
+            handleEdit: function(index, row) {
+                this.$emit('RightComponentEvent', {
+                    data: row,
+                    viewName: "WorkFormDetail",
+                    class: "animated bounceInRight",
+                    menuitems: "WorkFormDetail",
+                    action: "Edit",
+                    previousView:"QueryWorkForm"
+                });
+            }
         }
     }
 </script>

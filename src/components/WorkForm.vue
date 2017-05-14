@@ -77,7 +77,8 @@
                     viewName: "WorkFormDetail",
                     class: "animated bounceInRight",
                     menuitems: "WorkFormDetail",
-                    action: "Edit"
+                    action: "Edit",
+                    previousView:"WorkForm"
                 });
             },
             switchView: function() {
@@ -107,6 +108,8 @@
                     viewName: "WorkFormDetail",
                     class: "animated bounceInRight",
                     menuitems: "WorkFormDetail",
+                    viewName:"WorkFormDetail",
+                    previousView:"WorkForm",
                     action: "Create"
                 });
             }

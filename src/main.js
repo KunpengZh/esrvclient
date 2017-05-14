@@ -19,38 +19,35 @@ Vue.use(ElementUI, {
 
 Vue.config.productionTip = false
 
-const  vuex_store = new Vuex.Store({
-    state:{
-        curUser:{
-            username:"",
-            role:"",
-            isAdmin:false,
-            company:"",
-            fullname:"",
-            isAuthenticated:false
-        },
-        configdoc:{
-          companySource:[],
-          companyAdmin:[],
-          companyEmployee:[],
-          workItem:[],
-          workCategory:[],
-          spareParts:[],
-          securityTools:[]
-        }
+const vuex_store = new Vuex.Store({
+  state: {
+    curUser: {
+      username: "",
+      role: "",
+      isAdmin: false,
+      company: "",
+      fullname: "",
+      isAuthenticated: false
     },
-    mutations:{
-      //   isAdmin:function(){
-      //   return state.curUser.role==="Admin"
-      // }
-    }
+    configdoc: {
+      companySource: [],
+      companyAdmin: [],
+      companyEmployee: [],
+      workItem: [],
+      workCategory: [],
+      spareParts: [],
+      securityTools: []
+    },
+    qcriteria: ""
+  },
+  mutations: {
+  }
 })
 
-/* eslint-disable no-new */
 new Vue({
   el: '#app',
   router,
-  store:vuex_store, //注入到vue
+  store: vuex_store, //注入到vue
   template: '<App/>',
   components: {
     App
@@ -63,19 +60,27 @@ new Vue({
         isAuthenticated = response.body.isAuthenticated;
       }
       if (isAuthenticated) {
-        this.$store.state.curUser.username=response.body.username;
-        this.$store.state.curUser.isAuthenticated=response.body.isAuthenticated;
-        this.$store.state.curUser.role=response.body.role;
-        this.$store.state.curUser.company=response.body.company;
-        this.$store.state.curUser.fullname=response.body.fullname;
-        if(response.body.role==="Admin"){
-          this.$store.state.curUser.isAdmin=true;
-        }else{
-          this.$store.state.curUser.isAdmin=false;
+        this.$store.state.curUser.username = response.body.username;
+        this.$store.state.curUser.isAuthenticated = response.body.isAuthenticated;
+        this.$store.state.curUser.role = response.body.role;
+        this.$store.state.curUser.company = response.body.company;
+        this.$store.state.curUser.fullname = response.body.fullname;
+        if (response.body.role === "Admin") {
+          this.$store.state.curUser.isAdmin = true;
+        } else {
+          this.$store.state.curUser.isAdmin = false;
         }
-        this.$router.push({
-          path: '/home'
-        })
+        var path = window.location.pathname;
+        if (path === "/") {
+          this.$router.push({
+            path: '/home'
+          })
+        } else {
+          this.$router.push({
+            path: path
+          })
+        }
+
       } else {
         this.$router.push({
           path: '/login'

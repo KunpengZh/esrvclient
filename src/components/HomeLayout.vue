@@ -57,7 +57,8 @@
         components: {
             leftSideBar,
             WorkFormDetail,
-            WorkForm
+            WorkForm,
+            QueryWorkForm
         },
         data: function() {
             return {
@@ -71,7 +72,8 @@
         methods: {
             RightComponentEvent: function(options) {
                 this.opt.data = options.data;
-                this.opt.action=options.action;
+                this.opt.action = options.action;
+                this.opt.previousView = options.previousView;
                 this.rightComponentClass = options.class;
                 if (options.menuitems) {
                     this.menuitems = commonDataSource[options.menuitems];
@@ -183,6 +185,24 @@
                 })
             },
             logout: function() {
+                this.$store.state.qcriteria = "";
+                this.$store.state.curUser = {
+                    username: "",
+                    role: "",
+                    isAdmin: false,
+                    company: "",
+                    fullname: "",
+                    isAuthenticated: false
+                }
+                this.$store.state.configdoc = {
+                    companySource: [],
+                    companyAdmin: [],
+                    companyEmployee: [],
+                    workItem: [],
+                    workCategory: [],
+                    spareParts: [],
+                    securityTools: []
+                }
                 this.$http.get("/logout").then(function(res) {
                     this.$router.push({
                         path: '/login'
