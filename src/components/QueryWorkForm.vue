@@ -184,33 +184,42 @@
             },
             toAddAll: function(source) {
                 var haveAll = false;
-                for (var i = 0; i < source.length; i++) {
+                var newsource=[];
+                for(var i=0;i<source.length;i++) {
+                    newsource.push(source[i]);
                     if (source[i].name === "All") {
                         haveAll = true;
-                        break;
                     }
-    
                 }
+                // var haveAll = false;
+                // for (var i = 0; i < source.length; i++) {
+                //     if (source[i].name === "All") {
+                //         haveAll = true;
+                //         break;
+                //     }
+    
+                // }
                 if (!haveAll) {
-                    source.push({
+                    newsource.push({
                         name: "All",
                         attr: ""
                     });
                 }
+                return newsource;
             },
             initialstatus: function() {
                 var self = this;
                 if (this.$store.state.configdoc.companySource.length <= 0) {
                     this.loadConfigData(function() {
-                        self.query.datasource.companySource = self.$store.state.configdoc["companySource"]["data"];
-                        self.toAddAll(self.query.datasource.companySource);
+                        self.query.datasource.companySource = self.toAddAll(self.$store.state.configdoc["companySource"]["data"]);
+                        //self.toAddAll(self.query.datasource.companySource);
                         //self.query.datasource.companySource.push({name:"All",attr:""});
                         // self.request.datasource.companyAdmin = self.$store.state.configdoc["companyAdmin"]["data"];
                         // self.query.datasource.companyEmployee = self.$store.state.configdoc["companyEmployee"]["data"];
                         // self.query.datasource.companyEmployee.push({name:"All",attr:""});
                         // self.request.datasource.workItem = self.$store.state.configdoc["workItem"]["data"];
-                        self.query.datasource.workCategory = self.$store.state.configdoc["workCategory"]["data"];
-                        self.toAddAll(self.query.datasource.workCategory);
+                        self.query.datasource.workCategory = self.toAddAll(self.$store.state.configdoc["workCategory"]["data"]);
+                        //self.toAddAll(self.query.datasource.workCategory);
                         // self.request.datasource.securityTools = self.$store.state.configdoc["securityTools"]["data"];
                         // self.request.datasource.spareParts = self.$store.state.configdoc["spareParts"]["data"];
                         if (self.$store.state.curUser.isAdmin) {
@@ -222,16 +231,16 @@
                     })
                 } else {
                     if (this.query.datasource.companySource.length <= 0) {
-                        this.query.datasource.companySource = this.$store.state.configdoc["companySource"]["data"];
-                        self.toAddAll(self.query.datasource.companySource);
+                        this.query.datasource.companySource = self.toAddAll(this.$store.state.configdoc["companySource"]["data"]);
+                        //self.toAddAll(self.query.datasource.companySource);
                         // this.request.datasource.companyAdmin = this.$store.state.configdoc["companyAdmin"]["data"];
                         // this.query.datasource.companyEmployee = this.$store.state.configdoc["companyEmployee"]["data"];
                         // self.query.datasource.companyEmployee.push({name:"All",attr:""});
                         // this.request.datasource.workItem = this.$store.state.configdoc["workItem"]["data"];
                         // self.request.datasource.securityTools = self.$store.state.configdoc["securityTools"]["data"];
                         // self.request.datasource.spareParts = self.$store.state.configdoc["spareParts"]["data"];
-                        this.query.datasource.workCategory = this.$store.state.configdoc["workCategory"]["data"];
-                        self.toAddAll(self.query.datasource.workCategory);
+                        this.query.datasource.workCategory = self.toAddAll(this.$store.state.configdoc["workCategory"]["data"]);
+                        //self.toAddAll(self.query.datasource.workCategory);
                     }
                     if (self.$store.state.curUser.isAdmin) {
                         self.isAdmin = true;

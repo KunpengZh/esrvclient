@@ -412,6 +412,13 @@
                 if (!this.validateRequestForm()) {
                     return;
                 }
+                if (this.request.data.workhour === null || this.request.data.workhour === "") {
+                    this.$notify.error({
+                        title: 'Error',
+                        message: "工作数量不能为空"
+                    });
+                    return false;
+                }
                 if (this.request.data.returntime === "") {
                     this.$notify.error({
                         title: 'Error',
@@ -456,8 +463,8 @@
                         });
                         self.request.data = {
                             requestId: "",
-                            company: "",
-                            requester: "",
+                            company: self.request.data.company,
+                            requester: self.request.data.requester,
                             creationtime: "",
                             workitem: "",
                             workCategory: "",
@@ -476,8 +483,8 @@
                             isSecurityTools: "",
                             sanPiaoZhiXing: ""
                         }
-                        this.request.datasource.companyAdmin = [];
-                        this.request.datasource.companyEmployee = [];
+                        //this.request.datasource.companyAdmin = [];
+                        //this.request.datasource.companyEmployee = [];
                         this.request.datasource.workItem = [];
                         self.$http.get('/workformapi/requestid').then(function(res) {
                             var strbody = res.body;
