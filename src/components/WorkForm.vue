@@ -12,7 +12,11 @@
                 </el-table-column>
                 <el-table-column prop="returntime" label="返回时间" label-class-name="forcastHeader">
                 </el-table-column>
+                <el-table-column prop="workCategory" label="工作类别" label-class-name="forcastHeader">
+                </el-table-column>
                 <el-table-column prop="workitem" label="工作任务" label-class-name="forcastHeader">
+                </el-table-column>
+                <el-table-column prop="workhour" label="工作数量" label-class-name="forcastHeader">
                 </el-table-column>
                 <el-table-column label="操作">
                     <template scope="scope">
@@ -34,17 +38,24 @@
             }
         },
         mounted: function() {
+            var self=this;
             this.$nextTick(function() {
                 if (this.$store.state.curUser.isAuthenticated) {
-                    this.getCureUser();
+                    this.getCureUser(function(){
+                        self.$http.get("/workformapi/getr").then(function(res) {
+                        self.WorkFormDataSource = res.body;
+                    })
+                    });
+                }else{
+                    this.$http.get("/workformapi/getr").then(function(res) {
+                        this.WorkFormDataSource = res.body;
+                    })
                 }
-                this.$http.get("/workformapi/getr").then(function(res) {
-                    this.WorkFormDataSource = res.body;
-                })
+                
             })
         },
         methods: {
-            getCureUser: function() {
+            getCureUser: function(callback) {
                 this.$http.get('/login/isAuthenticated').then(response => {
                     var isAuthenticated = false;
                     if (response.body && response.body.isAuthenticated) {
@@ -56,14 +67,20 @@
                         this.$store.state.curUser.role = response.body.role;
                         this.$store.state.curUser.company = response.body.company;
                         this.$store.state.curUser.fullname = response.body.fullname;
-                        if (response.body.role === "Admin") {
-                            this.$store.state.curUser.isAdmin = true;
-                        } else {
-                            this.$store.state.curUser.isAdmin = false;
+                        this.$store.state.curUser.isAdmin = response.body.role==="Admin"?true:false;
+                        this.$store.state.curUser.isAdminOffice = response.body.role==="AdminOffice"?true:false;
+                        // if (response.body.role === "Admin") {
+                        //     this.$store.state.curUser.isAdmin = true;
+                        // } else {
+                        //     this.$store.state.curUser.isAdmin = false;
+                        // }
+                        // this.$router.push({
+                        //     path: '/home'
+                        // })
+                        if(callback){
+                            callback();
                         }
-                        this.$router.push({
-                            path: '/home'
-                        })
+
                     } else {
                         this.$router.push({
                             path: '/login'

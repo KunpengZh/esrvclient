@@ -62,11 +62,13 @@ export default {
                     this.$store.state.curUser.role=response.body.role;
                     this.$store.state.curUser.fullname=response.body.fullname;
                     this.$store.state.curUser.company=response.body.company;
-                    if(response.body.role==="Admin"){
-                        this.$store.state.curUser.isAdmin=true;
-                    }else{
-                        this.$store.state.curUser.isAdmin=false;
-                    }
+                    this.$store.state.curUser.isAdmin = response.body.role==="Admin"?true:false;
+                    this.$store.state.curUser.isAdminOffice = response.body.role==="AdminOffice"?true:false;
+                    // if(response.body.role==="Admin"){
+                    //     this.$store.state.curUser.isAdmin=true;
+                    // }else{
+                    //     this.$store.state.curUser.isAdmin=false;
+                    // }
                    this.$router.push({
                         path: '/home'
                     })

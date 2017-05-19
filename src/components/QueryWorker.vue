@@ -32,7 +32,7 @@
                     <el-col :span="12" style="text-align:left;">
                         <el-form-item :label="query.label.requester">
                             <el-select filterable v-model="query.criteria.requester" style="width:200px;">
-                                <el-option v-for="requester in query.datasource.companyAdmin" :label="requester.name" :value="requester.name" :key="requester.name"></el-option>
+                                <el-option v-for="req in query.datasource.companyAdmin" :label="req.name" :value="req.name" :key="req.name"></el-option>
                             </el-select>
                         </el-form-item>
                     </el-col>
@@ -61,8 +61,8 @@
                 </el-form-item>
             </el-form>
         </div>
-        <el-tabs v-model="activeTabName" >
-            <el-tab-pane  label="表格统计" name="summaryTableTab">
+        <el-tabs v-model="activeTabName">
+             <el-tab-pane  label="表格统计" name="summaryTableTab">
                     <el-table :data="summaryTable" border style="width:100%">
                         <el-table-column prop="company" label="派工单位" label-class-name="forcastHeader" width="150">
                         </el-table-column>
@@ -142,20 +142,14 @@
                         </el-table-column>
                         <el-table-column prop="workhour" label="工作数量" label-class-name="forcastHeader" width="100">
                         </el-table-column>
-                        <el-table-column prop="requestwage" label="总工钱" label-class-name="forcastHeader" width="100">
+                        <el-table-column prop="requestwage" label="工钱" label-class-name="forcastHeader" width="100">
                         </el-table-column>
-                        <el-table-column prop="strworkers" label="工作人员" label-class-name="forcastHeader" width="250">
-                        </el-table-column>
-                        <el-table-column label="操作" fixed="right">
-                            <template scope="scope">
-                                <el-button size="small" @click="handleEdit(scope.$index, scope.row)">详情</el-button>
-                            </template>
+                        <el-table-column prop="worker" label="工作人员" label-class-name="forcastHeader" width="100">
                         </el-table-column>
                     </el-table>
                 </div>
-            </el-tab-pane>
+         </el-tab-pane>
         </el-tabs>
-        
     </div>
 </template>
 
@@ -164,7 +158,7 @@
         name: 'QueryWorkHome',
         data: function() {
             return {
-                activeTabName:"detailTab",
+                 activeTabName:"detailTab",
                 WorkFormDataSource: [],
                 fullscreenLoading: false,
                 isAdmin: false,
@@ -182,7 +176,7 @@
                 },
                 query: {
                     label: {
-                        formTitle: "工单查询模块",
+                        formTitle: "作业人员查询模块",
                         requestId: "派工单号:",
                         company: "派工单位:",
                         creationtime: "派工时间:",
@@ -228,18 +222,18 @@
         },
         methods: {
             queryWorkForm: function() {
-                var qcriteria = {};
+                var wcriteria = {};
                 if (this.query.criteria.requestId !== "") {
-                    qcriteria.requestId = this.query.criteria.requestId;
+                    wcriteria.requestId = this.query.criteria.requestId;
                 }
                 if (this.query.criteria.company !== "" && this.query.criteria.company !== "All") {
-                    qcriteria.company = this.query.criteria.company;
+                    wcriteria.company = this.query.criteria.company;
                 }
                 if (this.query.criteria.requester !== "" && this.query.criteria.requester !== "All") {
-                    qcriteria.requester = this.query.criteria.requester;
+                    wcriteria.requester = this.query.criteria.requester;
                 }
                 if (this.query.criteria.creationtime !== "" && this.query.criteria.creationtime[0] !== null && this.query.criteria.creationtime[1] !== null) {
-                    qcriteria.creationtime = this.query.criteria.creationtime;
+                    wcriteria.creationtime = this.query.criteria.creationtime;
                     this.summary.creationtime= this.query.criteria.creationtime;
                 }else{
                     this.summary.creationtime="";
@@ -255,49 +249,33 @@
                     }
     
                     if (needworks) {
-                        qcriteria.workers = this.query.criteria.workers;
+                        wcriteria.workers = this.query.criteria.workers;
                     }
                 }
                 if (this.query.criteria.workCategory !== "" && this.query.criteria.workCategory !== "All") {
-                    qcriteria.workCategory = this.query.criteria.workCategory;
+                    wcriteria.workCategory = this.query.criteria.workCategory;
                 }
                 if (this.query.criteria.returntime !== "" && this.query.criteria.returntime[0] !== null && this.query.criteria.returntime[1] !== null) {
-                    qcriteria.returntime = this.query.criteria.returntime;
+                    wcriteria.returntime = this.query.criteria.returntime;
                     this.summary.returntime= this.query.criteria.returntime;
                 }else{
                     this.summary.returntime= "";
                 }
-    
-                this.queryData(qcriteria);
+                this.queryData(wcriteria);
     
             },
-            queryData: function(qcriteria) {
+            queryData: function(wcriteria) {
                 var self = this;
-                this.$store.state.qcriteria = qcriteria;
-                this.$http.post("/queryWorkForm/workform", {
-                    data: qcriteria
+                this.$store.state.wcriteria = wcriteria;
+                this.$http.post("/queryWorkForm/worker", {
+                    data: wcriteria
                 }).then(function(res) {
-                    self.WorkFormDataSource = self.buildRequestData(res.body);
+                    self.WorkFormDataSource = res.body;
                     self.updateSummary(res.body);
                 })
             },
-            buildRequestData:function(data){
-                for(var k=0;k<data.length;k++){
-                    var sworkers = data[k].workers;
-                    var workers='';
-                    for (var i = 0; i < sworkers.length; i++) {
-                        if (i === 0) {
-                            workers = sworkers[i];
-                        } else {
-                            workers = workers+" , " + sworkers[i];
-                        }
-                    };
-                    data[k].strworkers=workers;
-                }
-                return data;
-            },
             updateSummary:function(source){
-                var summary={
+                 var summary={
                     company:'',
                     worker:'',
                     requester:'',
@@ -328,29 +306,26 @@
                         }
                     }
 
-                    var workers=source[i].workers;
-                    for(var k=0;k<workers.length;k++){
-                        var worker=workers[k];
-                        if(summary.worker.indexOf(worker)<0){
-                            if(summary.worker===""){
-                                summary.worker=worker
-                            }else{
-                                summary.worker=summary.worker+"," +worker
-                            }
-                        }
-                        if(curObj.worker){
-                            if(curObj.worker.indexOf(worker)<0){
-                                if(curObj.worker===""){
-                                    curObj.worker=worker
-                                }else{
-                                    curObj.worker=curObj.worker+"," +worker
-                                }
-                            }
+                    var worker=source[i].worker;
+                    if(summary.worker.indexOf(worker)<0){
+                        if(summary.worker===""){
+                            summary.worker=worker
                         }else{
-                            curObj.worker=worker
+                            summary.worker=summary.worker+"," +worker
                         }
                     }
-
+                    if(curObj.worker){
+                        if(curObj.worker.indexOf(worker)<0){
+                            if(curObj.worker===""){
+                                 curObj.worker=worker
+                            }else{
+                                curObj.worker=curObj.worker+"," +worker
+                              }
+                            }
+                    }else{
+                        curObj.worker=worker
+                    }
+                    
                     if(summary.requester.indexOf(source[i].requester)<0){
                         if(summary.requester===""){
                             summary.requester=source[i].requester
@@ -453,7 +428,6 @@
                         returntime:''
                     }
                 }
-
             },
             getCureUser: function(callback) {
                 self.$http.get('/login/isAuthenticated').then(response => {
@@ -469,6 +443,11 @@
                         self.$store.state.curUser.fullname = response.body.fullname;
                         self.$store.state.curUser.isAdmin = response.body.role === "Admin" ? true : false;
                         self.$store.state.curUser.isAdminOffice = response.body.role === "AdminOffice" ? true : false;
+                        // if (response.body.role === "Admin" || response.body.role === "AdminOffice") {
+                        //     self.$store.state.curUser.isAdmin = true;
+                        // } else {
+                        //     self.$store.state.curUser.isAdmin = false;
+                        // }
                     }
                     if (callback) {
                         callback();
@@ -551,13 +530,13 @@
             setInitialCriteria: function() {
                 var self = this;
                 var criteria = {
-                    requestId: self.$store.state.qcriteria.requestId ? self.$store.state.qcriteria.requestId : "",
-                    company: self.$store.state.qcriteria.company ? self.$store.state.qcriteria.company : "",
-                    creationtime: self.$store.state.qcriteria.creationtime ? self.$store.state.qcriteria.creationtime : "",
-                    workers: self.$store.state.qcriteria.workers ? self.$store.state.qcriteria.workers : [],
-                    workCategory: self.$store.state.qcriteria.workCategory ? self.$store.state.qcriteria.workCategory : "",
-                    returntime: self.$store.state.qcriteria.returntime ? self.$store.state.qcriteria.returntime : "",
-                    requester: self.$store.state.qcriteria.requester ? self.$store.state.qcriteria.requester : ""
+                    requestId: self.$store.state.wcriteria.requestId ? self.$store.state.wcriteria.requestId : "",
+                    company: self.$store.state.wcriteria.company ? self.$store.state.wcriteria.company : "",
+                    creationtime: self.$store.state.wcriteria.creationtime ? self.$store.state.wcriteria.creationtime : "",
+                    workers: self.$store.state.wcriteria.workers ? self.$store.state.wcriteria.workers : [],
+                    workCategory: self.$store.state.wcriteria.workCategory ? self.$store.state.wcriteria.workCategory : "",
+                    returntime: self.$store.state.wcriteria.returntime ? self.$store.state.wcriteria.returntime : "",
+                    requester: self.$store.state.wcriteria.requester ? self.$store.state.wcriteria.requester : "",
                 };
                 self.query.criteria = criteria;
                 self.queryWorkForm();
@@ -565,8 +544,9 @@
             initialRequestData: function() {
                 var self = this;
                 self.query.criteria.company = self.$store.state.curUser.company
+                console.log(self.query.criteria.company);
                 self.handleCompanyChange(self.query.criteria.company);
-                if (self.$store.state.qcriteria !== "") {
+                if (self.$store.state.wcriteria !== "") {
                     self.setInitialCriteria();
                 }
     

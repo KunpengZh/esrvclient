@@ -61,21 +61,7 @@
                 </el-form-item>
             </el-form>
         </div>
-        <el-tabs v-model="activeTabName" >
-            <el-tab-pane  label="表格统计" name="summaryTableTab">
-                    <el-table :data="summaryTable" border style="width:100%">
-                        <el-table-column prop="company" label="派工单位" label-class-name="forcastHeader" width="150">
-                        </el-table-column>
-                        <el-table-column prop="workhourNum" label="工作总量" label-class-name="forcastHeader" width="100">
-                        </el-table-column>
-                        <el-table-column prop="requestNum"  label="工单数量" label-class-name="forcastHeader" width="100">
-                        </el-table-column>
-                        <el-table-column  prop="wageNum" label="工钱总额" label-class-name="forcastHeader" width="100">
-                        </el-table-column>
-                        <el-table-column  prop="worker" label="作业人员" label-class-name="forcastHeader">
-                        </el-table-column>
-                    </el-table>
-             </el-tab-pane>
+        <el-tabs v-model="activeTabName">
             <el-tab-pane label="综合统计" name="summaryTab">
                  <el-form ref="form" :model="summary" label-width="100px">
                     <el-row>
@@ -104,12 +90,12 @@
                     </el-row>
                     <el-row>
                         <el-col :span="8" style="text-align:left;">
-                            <el-form-item label="派工日期:">
+                            <el-form-item label="派工起止日期:">
                                <label>{{summary.creationtime}}</label>
                             </el-form-item>
                         </el-col>
                         <el-col :span="16" style="text-align:left;">
-                            <el-form-item label="完工日期:">
+                            <el-form-item label="完工起止日期:">
                                 <label>{{summary.returntime}}</label>
                             </el-form-item>
                         </el-col>
@@ -142,20 +128,14 @@
                         </el-table-column>
                         <el-table-column prop="workhour" label="工作数量" label-class-name="forcastHeader" width="100">
                         </el-table-column>
-                        <el-table-column prop="requestwage" label="总工钱" label-class-name="forcastHeader" width="100">
+                        <el-table-column prop="requestwage" label="工钱" label-class-name="forcastHeader" width="100">
                         </el-table-column>
-                        <el-table-column prop="strworkers" label="工作人员" label-class-name="forcastHeader" width="250">
-                        </el-table-column>
-                        <el-table-column label="操作" fixed="right">
-                            <template scope="scope">
-                                <el-button size="small" @click="handleEdit(scope.$index, scope.row)">详情</el-button>
-                            </template>
+                        <el-table-column prop="worker" label="工作人员" label-class-name="forcastHeader" width="100">
                         </el-table-column>
                     </el-table>
                 </div>
-            </el-tab-pane>
+         </el-tab-pane>
         </el-tabs>
-        
     </div>
 </template>
 
@@ -164,11 +144,10 @@
         name: 'QueryWorkHome',
         data: function() {
             return {
-                activeTabName:"detailTab",
+                 activeTabName:"summaryTab",
                 WorkFormDataSource: [],
                 fullscreenLoading: false,
                 isAdmin: false,
-                summaryTable:[],
                 summary:{
                     company:'',
                     worker:'',
@@ -182,7 +161,7 @@
                 },
                 query: {
                     label: {
-                        formTitle: "工单查询模块",
+                        formTitle: "作业人员查询模块",
                         requestId: "派工单号:",
                         company: "派工单位:",
                         creationtime: "派工时间:",
@@ -267,34 +246,18 @@
                 }else{
                     this.summary.returntime= "";
                 }
-    
                 this.queryData(qcriteria);
     
             },
             queryData: function(qcriteria) {
                 var self = this;
                 this.$store.state.qcriteria = qcriteria;
-                this.$http.post("/queryWorkForm/workform", {
+                this.$http.post("/queryWorkForm/worker", {
                     data: qcriteria
                 }).then(function(res) {
-                    self.WorkFormDataSource = self.buildRequestData(res.body);
+                    self.WorkFormDataSource = res.body;
                     self.updateSummary(res.body);
                 })
-            },
-            buildRequestData:function(data){
-                for(var k=0;k<data.length;k++){
-                    var sworkers = data[k].workers;
-                    var workers='';
-                    for (var i = 0; i < sworkers.length; i++) {
-                        if (i === 0) {
-                            workers = sworkers[i];
-                        } else {
-                            workers = workers+" , " + sworkers[i];
-                        }
-                    };
-                    data[k].strworkers=workers;
-                }
-                return data;
             },
             updateSummary:function(source){
                 var summary={
@@ -308,49 +271,23 @@
                     returntime: "",
                     requester: ""
                 }
-                var sumTable={};
                 var needupdate=false;
                 for(var i=0;i<source.length;i++){
                     needupdate=true;
-                    var curCompany=source[i].company;
-                    var curObj;
-
-                    if(sumTable[curCompany]){
-                        curObj=sumTable[curCompany];
-                    }else{
-                        curObj={
-                            company:source[i].company
-                        };
+                    if(summary.company.indexOf(source[i].company)<0){
                         if(summary.company===""){
                             summary.company=source[i].company
                         }else{
                              summary.company=summary.company+"," +source[i].company
                         }
                     }
-
-                    var workers=source[i].workers;
-                    for(var k=0;k<workers.length;k++){
-                        var worker=workers[k];
-                        if(summary.worker.indexOf(worker)<0){
-                            if(summary.worker===""){
-                                summary.worker=worker
-                            }else{
-                                summary.worker=summary.worker+"," +worker
-                            }
-                        }
-                        if(curObj.worker){
-                            if(curObj.worker.indexOf(worker)<0){
-                                if(curObj.worker===""){
-                                    curObj.worker=worker
-                                }else{
-                                    curObj.worker=curObj.worker+"," +worker
-                                }
-                            }
+                    if(summary.worker.indexOf(source[i].worker)<0){
+                        if(summary.worker===""){
+                            summary.worker=source[i].worker
                         }else{
-                            curObj.worker=worker
+                             summary.worker=summary.worker+"," +source[i].worker
                         }
                     }
-
                     if(summary.requester.indexOf(source[i].requester)<0){
                         if(summary.requester===""){
                             summary.requester=source[i].requester
@@ -358,19 +295,6 @@
                              summary.requester=summary.requester+"," +source[i].requester
                         }
                     }
-                    if(curObj.requester){
-                        if(curObj.requester.indexOf(source[i].requester)<0){
-                            if(curObj.requester===""){
-                                curObj.requester=source[i].requester
-                            }else{
-                                curObj.requester=curObj.requester+"," +source[i].requester
-                            }
-                        }
-                    }else{
-                        curObj.requester=source[i].requester
-                    }
-
-
                     if(summary.workCategory.indexOf(source[i].workCategory)<0){
                         if(summary.workCategory===""){
                             summary.workCategory=source[i].workCategory
@@ -378,41 +302,10 @@
                              summary.workCategory=summary.workCategory+"," +source[i].workCategory
                         }
                     }
-                    if(curObj.workCategory){
-                        if(curObj.workCategory.indexOf(source[i].workCategory)<0){
-                            if(curObj.workCategory===""){
-                                curObj.workCategory=source[i].workCategory
-                            }else{
-                                curObj.workCategory=curObj.workCategory+"," +source[i].workCategory
-                            }
-                        }
-                    }else{
-                        curObj.workCategory=source[i].workCategory;
-                    }
-
-
                     summary.requestNum++;
-                    if(curObj.requestNum){
-                        curObj.requestNum++
-                    }else{
-                        curObj.requestNum=1;
-                    }
                     summary.wageNum=summary.wageNum+source[i].requestwage
-                    if(curObj.wageNum){
-                        curObj.wageNum=curObj.wageNum+source[i].requestwage
-                    }else{
-                        curObj.wageNum=source[i].requestwage
-                    }
-
                     summary.workhourNum=summary.workhourNum+source[i].workhour
-                    if(curObj.workhourNum){
-                        curObj.workhourNum=curObj.workhourNum+source[i].workhour
-                    }else{
-                        curObj.workhourNum=source[i].workhour
-                    }
-                    sumTable[curCompany]=curObj;
                 }
-                
 
                 var returntime='';
                 if(this.summary.returntime!==''){
@@ -433,27 +326,8 @@
                 
                 summary.returntime=returntime;
                 summary.creationtime=creationtime;
-                if(needupdate){
-                    this.summary=summary;
-                    this.summaryTable=[];
-                    for(var key in sumTable){
-                        this.summaryTable.push(sumTable[key]);
-                    }
-                }else{
-                    this.summaryTable=[];
-                    this.summary={
-                        company:'',
-                        worker:'',
-                        requester:'',
-                        workCategory:'',
-                        requestNum:'',
-                        wageNum:'',
-                        workhourNum:'',
-                        creationtime:'',
-                        returntime:''
-                    }
-                }
-
+                console.log(summary);
+                if(needupdate){this.summary=summary;}
             },
             getCureUser: function(callback) {
                 self.$http.get('/login/isAuthenticated').then(response => {
@@ -469,6 +343,11 @@
                         self.$store.state.curUser.fullname = response.body.fullname;
                         self.$store.state.curUser.isAdmin = response.body.role === "Admin" ? true : false;
                         self.$store.state.curUser.isAdminOffice = response.body.role === "AdminOffice" ? true : false;
+                        // if (response.body.role === "Admin" || response.body.role === "AdminOffice") {
+                        //     self.$store.state.curUser.isAdmin = true;
+                        // } else {
+                        //     self.$store.state.curUser.isAdmin = false;
+                        // }
                     }
                     if (callback) {
                         callback();
@@ -556,8 +435,7 @@
                     creationtime: self.$store.state.qcriteria.creationtime ? self.$store.state.qcriteria.creationtime : "",
                     workers: self.$store.state.qcriteria.workers ? self.$store.state.qcriteria.workers : [],
                     workCategory: self.$store.state.qcriteria.workCategory ? self.$store.state.qcriteria.workCategory : "",
-                    returntime: self.$store.state.qcriteria.returntime ? self.$store.state.qcriteria.returntime : "",
-                    requester: self.$store.state.qcriteria.requester ? self.$store.state.qcriteria.requester : ""
+                    returntime: self.$store.state.qcriteria.returntime ? self.$store.state.qcriteria.returntime : ""
                 };
                 self.query.criteria = criteria;
                 self.queryWorkForm();

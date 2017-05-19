@@ -38,7 +38,8 @@ const vuex_store = new Vuex.Store({
       spareParts: [],
       securityTools: []
     },
-    qcriteria: ""
+    qcriteria: "",
+    wcriteria: ""
   },
   mutations: {
   }
@@ -65,11 +66,13 @@ new Vue({
         this.$store.state.curUser.role = response.body.role;
         this.$store.state.curUser.company = response.body.company;
         this.$store.state.curUser.fullname = response.body.fullname;
-        if (response.body.role === "Admin") {
-          this.$store.state.curUser.isAdmin = true;
-        } else {
-          this.$store.state.curUser.isAdmin = false;
-        }
+        this.$store.state.curUser.isAdmin = response.body.role==="Admin"?true:false;
+        this.$store.state.curUser.isAdminOffice = response.body.role==="AdminOffice"?true:false;
+        // if (response.body.role === "Admin") {
+        //   this.$store.state.curUser.isAdmin = true;
+        // } else {
+        //   this.$store.state.curUser.isAdmin = false;
+        // }
         var path = window.location.pathname;
         if (path === "/") {
           this.$router.push({

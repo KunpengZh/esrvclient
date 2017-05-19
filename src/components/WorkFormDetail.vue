@@ -16,7 +16,7 @@
                 <tr>
                     <td width="10%">{{request.label.company}}</td>
                     <td width="23%">
-                        <el-select :disabled="isEdithModel || isCreateModel" filterable v-model="request.data.company" v-on:change="handleCompanyChange">
+                        <el-select :disabled="isEdithModel || !isAdmin" filterable v-model="request.data.company" v-on:change="handleCompanyChange">
                             <el-option v-for="company in request.datasource.companySource" :label="company.name" :value="company.name" :key="company.name"></el-option>
                         </el-select>
                     </td>
@@ -38,7 +38,7 @@
                     </td>
                     <td>{{request.label.workhour}}</td>
                     <td>
-                        <el-input :disabled="isCreateModel" v-model="request.data.workhour" placeholder="请输入工作小时数" style="width:80%" v-on:change="handleWorkhourInput"></el-input>
+                        <el-input :disabled="isCreateModel || isWorkFormClosed" v-model="request.data.workhour" placeholder="请输入工作小时数" style="width:80%" v-on:change="handleWorkhourInput"></el-input>
                     </td>
                     <td>{{request.label.planreturntime}}</td>
                     <td>
@@ -187,6 +187,7 @@
                 dialogFormVisible: false,
                 action: this.options.action,
                 isCreateModel: false,
+                isAdmin:false,
                 uplaodDialogTitle: "上传现场照片",
                 lockSecurityTools: true,
                 lockSpareParts: true,
@@ -288,6 +289,11 @@
                     self.isCreateModel = true;
                     self.isWorkFormClosed = false;
                     self.isEdithModel = false;
+                    if(self.$store.state.curUser.isAdminOffice || self.$store.state.curUser.isAdmin){
+                        self.isAdmin=true;
+                    }else{
+                        self.isAdmin=false;
+                    }
     
                     self.request.data.company = self.$store.state.curUser.company;
                     self.request.data.requester = self.$store.state.curUser.fullname;
@@ -321,11 +327,13 @@
                         self.$store.state.curUser.role = response.body.role;
                         self.$store.state.curUser.company = response.body.company;
                         this.$store.state.curUser.fullname=response.body.fullname;
-                        if (response.body.role === "Admin") {
-                            self.$store.state.curUser.isAdmin = true;
-                        } else {
-                            self.$store.state.curUser.isAdmin = false;
-                        }
+                        self.$store.state.curUser.isAdmin = response.body.role==="Admin"?true:false;
+                        self.$store.state.curUser.isAdminOffice = response.body.role==="AdminOffice"?true:false;
+                        // if (response.body.role === "Admin") {
+                        //     self.$store.state.curUser.isAdmin = true;
+                        // } else {
+                        //     self.$store.state.curUser.isAdmin = false;
+                        // }
                     }
                     if (callback) {
                         callback();

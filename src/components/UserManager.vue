@@ -39,6 +39,7 @@
             <el-select v-model="user.role" placeholder="请选择用户角色">
               <el-option label="管理员" value="Admin"></el-option>
               <el-option label="普通用户" value="User"></el-option>
+              <el-option label="县局用户" value="AdminOffice"></el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="用户密码" :label-width="formLabelWidth" v-show="showResetPssword">

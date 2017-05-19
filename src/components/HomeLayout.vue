@@ -50,6 +50,7 @@
     import WorkForm from '@/components/WorkForm'
     import WorkFormDetail from '@/components/WorkFormDetail'
     import QueryWorkForm from '@/components/QueryWorkForm'
+    import QueryWorker from '@/components/QueryWorker'
     
     
     export default {
@@ -58,7 +59,8 @@
             leftSideBar,
             WorkFormDetail,
             WorkForm,
-            QueryWorkForm
+            QueryWorkForm,
+            QueryWorker
         },
         data: function() {
             return {
@@ -115,6 +117,11 @@
                             "viewName": "QueryWorkForm"
                         });
                         break;
+                    case "queryWorker":
+                        this.switchViewEvent({
+                            "viewName": "QueryWorker"
+                        });
+                        break;
                     default:
                         this.currentView = Home;
                 }
@@ -151,6 +158,11 @@
                         self.currentView = QueryWorkForm;
                         self.fullscreenLoading = false;
                         self.menuitems = commonDataSource.queryWorkform;
+                        break;
+                    case "QueryWorker":
+                        self.currentView = QueryWorker;
+                        self.fullscreenLoading = false;
+                        self.menuitems = commonDataSource.queryWorker;
                         break;
                     default:
                         self.fullscreenLoading = false;
@@ -190,6 +202,7 @@
                     username: "",
                     role: "",
                     isAdmin: false,
+                    isAdminOffice:false,
                     company: "",
                     fullname: "",
                     isAuthenticated: false

@@ -7,8 +7,8 @@
         </ul>
         <h3 class="paddingBottom">汇总查询</h3>
         <ul class="marginBottom">
-            <li class="paddingBottom" id="bom-upload"><a href="/queryWorkform" v-on:click="triggerEvent">工单查询</a>
-            </li>
+            <li class="paddingBottom" id="bom-upload"><a href="/queryWorkform" v-on:click="triggerEvent">按工单查询</a></li>
+            <li class="paddingBottom" id="bom-upload"><a href="/queryWorker" v-on:click="triggerEvent">作业人员查询</a></li>
         </ul>
         <h3 class="paddingBottom">汇总打印</h3>
         <ul class="marginBottom">
@@ -56,6 +56,9 @@
                         break;
                     case "/queryWorkform":
                         this.$emit('LeftSideBarEvent', 'queryWorkform');
+                        break;
+                    case "/queryWorker":
+                        this.$emit('LeftSideBarEvent','queryWorker');
                         break;
                 }
             }
