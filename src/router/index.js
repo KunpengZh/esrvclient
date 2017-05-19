@@ -3,6 +3,8 @@ import Router from 'vue-router'
 import HomeLayout from '@/components/HomeLayout'
 import Login from '@/components/Login'
 import PrintWorkForm from '@/components/PrintWorkForm'
+import PrintMonthlyReport from '@/components/PrintMonthlyReport'
+import PrintAnnuallyReport from '@/components/PrintAnnuallyReport'
 
 Vue.use(Router)
 export default new Router({
@@ -25,7 +27,16 @@ export default new Router({
       path: '/printWorkForm',
       name: 'printWorkForm',
       component: PrintWorkForm
-
+    },
+    {
+      path: '/printMonthlyReport',
+      name: 'printMonthlyReport',
+      component: PrintMonthlyReport
+    },
+    {
+      path: '/printAnnuallyReport',
+      name: 'printAnnuallyReport',
+      component: PrintAnnuallyReport
     }
   ]
 })

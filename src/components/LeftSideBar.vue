@@ -12,13 +12,9 @@
         </ul>
         <h3 class="paddingBottom">汇总打印</h3>
         <ul class="marginBottom">
-            <li class="paddingBottom" id="bom-upload"><a href="#">生成月报</a>
+            <li class="paddingBottom" id="bom-upload"><a href="/queryMonthly" v-on:click="triggerEvent">按月查询工单</a>
             </li>
-            <li class="paddingBottom" id="bom-show"><a href="#">生成年报</a>
-            </li>
-            <li class="paddingBottom" id="bom-show"><a href="#">按派工单位月明细报表</a>
-            </li>
-            <li class="paddingBottom" id="bom-show"><a href="#">按派工单位年明细报表</a>
+            <li class="paddingBottom" id="bom-show"><a href="/queryAnnually" v-on:click="triggerEvent">按年生查询工单</a>
             </li>
         </ul>
         <h3 class="paddingBottom" v-if="isAdmin">管理员工具</h3>
@@ -59,6 +55,12 @@
                         break;
                     case "/queryWorker":
                         this.$emit('LeftSideBarEvent','queryWorker');
+                        break;
+                    case "/queryMonthly":
+                        this.$emit('LeftSideBarEvent','queryMonthly');
+                        break;
+                    case "/queryAnnually":
+                        this.$emit('LeftSideBarEvent','queryAnnually');
                         break;
                 }
             }

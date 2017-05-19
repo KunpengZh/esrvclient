@@ -8,60 +8,45 @@
         <div class="boxdiv">
             <el-form ref="form" :model="query" label-width="100px">
                 <el-row>
-                    <el-col :span="12" style="text-align:left;">
-                        <el-form-item :label="query.label.requestId">
-                            <el-input v-model="query.criteria.requestId" style="width:200px;"></el-input>
-                        </el-form-item>
-                    </el-col>
-                    <el-col :span="12" style="text-align:left;">
-                        <el-form-item :label="query.label.workCategory">
-                            <el-select v-model="query.criteria.workCategory" style="width:200px;">
-                                <el-option v-for="workcategory in query.datasource.workCategory" :label="workcategory.name" :value="workcategory.name" :key="workcategory.name"></el-option>
-                            </el-select>
-                        </el-form-item>
-                    </el-col>
-                </el-row>
-                <el-row>
-                    <el-col :span="12" style="text-align:left;">
+                    <el-col :span="16" style="text-align:left;">
                         <el-form-item :label="query.label.company">
-                            <el-select :disabled="!isAdmin" filterable v-model="query.criteria.company" v-on:change="handleCompanyChange" style="width:200px;">
+                            <el-select :disabled="!isAdmin" filterable multiple v-model="query.criteria.company" style="width:80%">
                                 <el-option v-for="company in query.datasource.companySource" :label="company.name" :value="company.name" :key="company.name"></el-option>
                             </el-select>
                         </el-form-item>
                     </el-col>
-                    <el-col :span="12" style="text-align:left;">
-                        <el-form-item :label="query.label.requester">
-                            <el-select filterable v-model="query.criteria.requester" style="width:200px;">
-                                <el-option v-for="requester in query.datasource.companyAdmin" :label="requester.name" :value="requester.name" :key="requester.name"></el-option>
-                            </el-select>
-                        </el-form-item>
-                    </el-col>
-                </el-row>
-                <el-row>
-                    <el-col :span="12" style="text-align:left;">
-                        <el-form-item :label="query.label.creationtime">
-                            <el-date-picker v-model="query.criteria.creationtime" type="daterange" placeholder="选择日期范围">
-                            </el-date-picker>
-                        </el-form-item>
-                    </el-col>
-                    <el-col :span="12" style="text-align:left;">
-                        <el-form-item :label="query.label.returntime">
-                            <el-date-picker v-model="query.criteria.returntime" type="daterange" placeholder="选择实际返回日期范围">
+                    <el-col :span="8" style="text-align:left;">
+                        <el-form-item :label="query.label.month">
+                            <el-date-picker v-model="query.criteria.month" type="month" placeholder="选择月份">
                             </el-date-picker>
                         </el-form-item>
                     </el-col>
                 </el-row>
-                <el-form-item :label="query.label.workers">
-                    <el-select filterable multiple v-model="query.criteria.workers" style="width:100%">
-                        <el-option v-for="workers in query.datasource.companyEmployee" :label="workers.name" :value="workers.name" :key="workers.name"></el-option>
-                    </el-select>
-                </el-form-item>
                 <el-form-item class="textAlignRight" style="margin-bottom:0;">
                     <el-button type="primary" @click="queryWorkForm">按所选条件查询</el-button>
                 </el-form-item>
             </el-form>
         </div>
-        <el-tabs v-model="activeTabName">
+        <el-tabs v-model="activeTabName" >
+            <el-tab-pane  label="表格统计" name="summaryTableTab">
+                    <el-table :data="summaryTable" border style="width:100%">
+                        <el-table-column prop="company" label="派工单位" label-class-name="forcastHeader" width="150">
+                        </el-table-column>
+                        <el-table-column prop="workhourNum" label="工作总量" label-class-name="forcastHeader" width="100">
+                        </el-table-column>
+                        <el-table-column prop="requestNum"  label="工单数量" label-class-name="forcastHeader" width="100">
+                        </el-table-column>
+                        <el-table-column  prop="wageNum" label="工钱总额" label-class-name="forcastHeader" width="100">
+                        </el-table-column>
+                        <el-table-column  prop="worker" label="作业人员" label-class-name="forcastHeader">
+                        </el-table-column>
+                    </el-table>
+                     <el-row class="textAlignRight" style="margin-top:20px;">
+                        <el-col :span="24">
+                            <el-button type="primary" @click="pringWorkForm()">打印预览</el-button>
+                        </el-col>
+                     </el-row>
+             </el-tab-pane>
             <el-tab-pane label="综合统计" name="summaryTab">
                  <el-form ref="form" :model="summary" label-width="100px">
                     <el-row>
@@ -90,12 +75,12 @@
                     </el-row>
                     <el-row>
                         <el-col :span="8" style="text-align:left;">
-                            <el-form-item label="派工起止日期:">
+                            <el-form-item label="派工日期:">
                                <label>{{summary.creationtime}}</label>
                             </el-form-item>
                         </el-col>
                         <el-col :span="16" style="text-align:left;">
-                            <el-form-item label="完工起止日期:">
+                            <el-form-item label="完工日期:">
                                 <label>{{summary.returntime}}</label>
                             </el-form-item>
                         </el-col>
@@ -128,14 +113,15 @@
                         </el-table-column>
                         <el-table-column prop="workhour" label="工作数量" label-class-name="forcastHeader" width="100">
                         </el-table-column>
-                        <el-table-column prop="requestwage" label="工钱" label-class-name="forcastHeader" width="100">
+                        <el-table-column prop="requestwage" label="总工钱" label-class-name="forcastHeader" width="100">
                         </el-table-column>
-                        <el-table-column prop="worker" label="工作人员" label-class-name="forcastHeader" width="100">
+                        <el-table-column prop="strworkers" label="工作人员" label-class-name="forcastHeader" width="250">
                         </el-table-column>
                     </el-table>
                 </div>
-         </el-tab-pane>
+            </el-tab-pane>
         </el-tabs>
+        
     </div>
 </template>
 
@@ -144,12 +130,13 @@
         name: 'QueryWorkHome',
         data: function() {
             return {
-                 activeTabName:"summaryTab",
+                activeTabName:"detailTab",
                 WorkFormDataSource: [],
                 fullscreenLoading: false,
                 isAdmin: false,
+                summaryTable:[],
                 summary:{
-                    company:'',
+                    company:[],
                     worker:'',
                     requester:'',
                     workCategory:'',
@@ -161,32 +148,16 @@
                 },
                 query: {
                     label: {
-                        formTitle: "作业人员查询模块",
-                        requestId: "派工单号:",
+                        formTitle: "月报查询模块",
                         company: "派工单位:",
-                        creationtime: "派工时间:",
-                        workers: "工作人员:",
-                        workCategory: "任务类别:",
-                        returntime: "实际返回时间:",
-                        requester: "派工人员:"
+                        month: "选择月份:"
                     },
                     criteria: {
-                        requestId: "",
-                        company: "",
-                        creationtime: "",
-                        workers: [],
-                        workCategory: "",
-                        returntime: "",
-                        requester: ""
+                        company: [],
+                        month:""
                     },
                     datasource: {
                         companySource: [],
-                        companyAdmin: [],
-                        companyEmployee: [],
-                        workItem: [],
-                        workCategory: [],
-                        securityTools: [],
-                        spareParts: []
                     },
                     previousValue: {
                         company: "",
@@ -207,57 +178,55 @@
         },
         methods: {
             queryWorkForm: function() {
-                var qcriteria = {};
-                if (this.query.criteria.requestId !== "") {
-                    qcriteria.requestId = this.query.criteria.requestId;
-                }
-                if (this.query.criteria.company !== "" && this.query.criteria.company !== "All") {
-                    qcriteria.company = this.query.criteria.company;
-                }
-                if (this.query.criteria.requester !== "" && this.query.criteria.requester !== "All") {
-                    qcriteria.requester = this.query.criteria.requester;
-                }
-                if (this.query.criteria.creationtime !== "" && this.query.criteria.creationtime[0] !== null && this.query.criteria.creationtime[1] !== null) {
-                    qcriteria.creationtime = this.query.criteria.creationtime;
-                    this.summary.creationtime= this.query.criteria.creationtime;
-                }else{
-                    this.summary.creationtime="";
-                }
-                if (this.query.criteria.workers.length > 0) {
-                    var needworks = true;
-                    var workers = this.query.criteria.workers;
-                    for (var i = 0; i < workers.length; i++) {
-                        if (workers[i] === "All") {
-                            needworks = false;
-                            break;
+                var mcriteria = {};
+                if (this.query.criteria.company.length>0) {
+                    var companySource=this.query.criteria.company;
+                    var findAll=false;
+                    for(var i=0;i<companySource.length;i++){
+                        if(companySource[i]==="All"){
+                            findAll=true;
                         }
                     }
-    
-                    if (needworks) {
-                        qcriteria.workers = this.query.criteria.workers;
+                    if(!findAll){
+                        mcriteria.company = this.query.criteria.company;
                     }
-                }
-                if (this.query.criteria.workCategory !== "" && this.query.criteria.workCategory !== "All") {
-                    qcriteria.workCategory = this.query.criteria.workCategory;
-                }
-                if (this.query.criteria.returntime !== "" && this.query.criteria.returntime[0] !== null && this.query.criteria.returntime[1] !== null) {
-                    qcriteria.returntime = this.query.criteria.returntime;
-                    this.summary.returntime= this.query.criteria.returntime;
+                } 
+
+                if (this.query.criteria.month !== "") {
+                    mcriteria.month = this.query.criteria.month;
                 }else{
-                    this.summary.returntime= "";
+                    this.$notify.error({
+                        title: 'Error',
+                        message: "请选择月份"
+                    });
+                    return;
                 }
-                this.queryData(qcriteria);
+               this.queryData(mcriteria);
     
             },
-            queryData: function(qcriteria) {
+            queryData: function(mcriteria) {
                 var self = this;
-                this.$store.state.qcriteria = qcriteria;
-                this.$http.post("/queryWorkForm/worker", {
-                    data: qcriteria
+                this.$http.post("/queryWorkForm/month", {
+                    data: mcriteria
                 }).then(function(res) {
-                    self.WorkFormDataSource = res.body;
+                    self.WorkFormDataSource = self.buildRequestData(res.body);
                     self.updateSummary(res.body);
                 })
+            },
+            buildRequestData:function(data){
+                for(var k=0;k<data.length;k++){
+                    var sworkers = data[k].workers;
+                    var workers='';
+                    for (var i = 0; i < sworkers.length; i++) {
+                        if (i === 0) {
+                            workers = sworkers[i];
+                        } else {
+                            workers = workers+" , " + sworkers[i];
+                        }
+                    };
+                    data[k].strworkers=workers;
+                }
+                return data;
             },
             updateSummary:function(source){
                 var summary={
@@ -271,23 +240,49 @@
                     returntime: "",
                     requester: ""
                 }
+                var sumTable={};
                 var needupdate=false;
                 for(var i=0;i<source.length;i++){
                     needupdate=true;
-                    if(summary.company.indexOf(source[i].company)<0){
+                    var curCompany=source[i].company;
+                    var curObj;
+
+                    if(sumTable[curCompany]){
+                        curObj=sumTable[curCompany];
+                    }else{
+                        curObj={
+                            company:source[i].company
+                        };
                         if(summary.company===""){
                             summary.company=source[i].company
                         }else{
                              summary.company=summary.company+"," +source[i].company
                         }
                     }
-                    if(summary.worker.indexOf(source[i].worker)<0){
-                        if(summary.worker===""){
-                            summary.worker=source[i].worker
+
+                    var workers=source[i].workers;
+                    for(var k=0;k<workers.length;k++){
+                        var worker=workers[k];
+                        if(summary.worker.indexOf(worker)<0){
+                            if(summary.worker===""){
+                                summary.worker=worker
+                            }else{
+                                summary.worker=summary.worker+"," +worker
+                            }
+                        }
+                        if(curObj.worker){
+                            if(curObj.worker.indexOf(worker)<0){
+                                if(curObj.worker===""){
+                                    curObj.worker=worker
+                                }else{
+                                    curObj.worker=curObj.worker+"," +worker
+                                }
+                            }
                         }else{
-                             summary.worker=summary.worker+"," +source[i].worker
+                            curObj.worker=worker
                         }
                     }
+
                     if(summary.requester.indexOf(source[i].requester)<0){
                         if(summary.requester===""){
                             summary.requester=source[i].requester
@@ -295,6 +290,19 @@
                              summary.requester=summary.requester+"," +source[i].requester
                         }
                     }
+                    if(curObj.requester){
+                        if(curObj.requester.indexOf(source[i].requester)<0){
+                            if(curObj.requester===""){
+                                curObj.requester=source[i].requester
+                            }else{
+                                curObj.requester=curObj.requester+"," +source[i].requester
+                            }
+                        }
+                    }else{
+                        curObj.requester=source[i].requester
+                    }
+
+
                     if(summary.workCategory.indexOf(source[i].workCategory)<0){
                         if(summary.workCategory===""){
                             summary.workCategory=source[i].workCategory
@@ -302,32 +310,62 @@
                              summary.workCategory=summary.workCategory+"," +source[i].workCategory
                         }
                     }
-                    summary.requestNum++;
-                    summary.wageNum=summary.wageNum+source[i].requestwage
-                    summary.workhourNum=summary.workhourNum+source[i].workhour
-                }
+                    if(curObj.workCategory){
+                        if(curObj.workCategory.indexOf(source[i].workCategory)<0){
+                            if(curObj.workCategory===""){
+                                curObj.workCategory=source[i].workCategory
+                            }else{
+                                curObj.workCategory=curObj.workCategory+"," +source[i].workCategory
+                            }
+                        }
+                    }else{
+                        curObj.workCategory=source[i].workCategory;
+                    }
 
-                var returntime='';
-                if(this.summary.returntime!==''){
-                    var date1=new Date(this.summary.returntime[0]);
-                    var d1=date1.getFullYear()+"-" + (date1.getMonth()+1)+"-" + date1.getDate()
-                    var date2=new Date(this.summary.returntime[1])
-                    var d2=date2.getFullYear()+"-" + (date2.getMonth()+1)+"-" + date2.getDate()
-                    returntime=d1+ " -- " + d2;
-                }
-                var creationtime='';
-                if(this.summary.creationtime!==''){
-                    var date1=new Date(this.summary.creationtime[0]);
-                    var d1=date1.getFullYear()+"-" + (date1.getMonth()+1)+"-" + date1.getDate()
-                    var date2=new Date(this.summary.creationtime[1])
-                    var d2=date2.getFullYear()+"-" + (date2.getMonth()+1)+"-" + date2.getDate()
-                    creationtime=d1+ " -- " + d2;
+
+                    summary.requestNum++;
+                    if(curObj.requestNum){
+                        curObj.requestNum++
+                    }else{
+                        curObj.requestNum=1;
+                    }
+                    summary.wageNum=summary.wageNum+source[i].requestwage
+                    if(curObj.wageNum){
+                        curObj.wageNum=curObj.wageNum+source[i].requestwage
+                    }else{
+                        curObj.wageNum=source[i].requestwage
+                    }
+
+                    summary.workhourNum=summary.workhourNum+source[i].workhour
+                    if(curObj.workhourNum){
+                        curObj.workhourNum=curObj.workhourNum+source[i].workhour
+                    }else{
+                        curObj.workhourNum=source[i].workhour
+                    }
+                    sumTable[curCompany]=curObj;
                 }
                 
-                summary.returntime=returntime;
-                summary.creationtime=creationtime;
-                console.log(summary);
-                if(needupdate){this.summary=summary;}
+                if(needupdate){
+                    this.summary=summary;
+                    this.summaryTable=[];
+                    for(var key in sumTable){
+                        this.summaryTable.push(sumTable[key]);
+                    }
+                }else{
+                    this.summaryTable=[];
+                    this.summary={
+                        company:'',
+                        worker:'',
+                        requester:'',
+                        workCategory:'',
+                        requestNum:'',
+                        wageNum:'',
+                        workhourNum:'',
+                        creationtime:'',
+                        returntime:''
+                    }
+                }
+
             },
             getCureUser: function(callback) {
                 self.$http.get('/login/isAuthenticated').then(response => {
@@ -343,11 +381,6 @@
                         self.$store.state.curUser.fullname = response.body.fullname;
                         self.$store.state.curUser.isAdmin = response.body.role === "Admin" ? true : false;
                         self.$store.state.curUser.isAdminOffice = response.body.role === "AdminOffice" ? true : false;
-                        // if (response.body.role === "Admin" || response.body.role === "AdminOffice") {
-                        //     self.$store.state.curUser.isAdmin = true;
-                        // } else {
-                        //     self.$store.state.curUser.isAdmin = false;
-                        // }
                     }
                     if (callback) {
                         callback();
@@ -379,10 +412,10 @@
                         //self.toAddAll(self.query.datasource.companySource);
                         //self.query.datasource.companySource.push({name:"All",attr:""});
                         // self.request.datasource.companyAdmin = self.$store.state.configdoc["companyAdmin"]["data"];
-                        self.query.datasource.companyEmployee = self.toAddAll(self.$store.state.configdoc["companyEmployee"]["data"]);
+                        //self.query.datasource.companyEmployee = self.toAddAll(self.$store.state.configdoc["companyEmployee"]["data"]);
                         // self.query.datasource.companyEmployee.push({name:"All",attr:""});
                         // self.request.datasource.workItem = self.$store.state.configdoc["workItem"]["data"];
-                        self.query.datasource.workCategory = self.toAddAll(self.$store.state.configdoc["workCategory"]["data"]);
+                        //self.query.datasource.workCategory = self.toAddAll(self.$store.state.configdoc["workCategory"]["data"]);
                         //self.toAddAll(self.query.datasource.workCategory);
                         // self.request.datasource.securityTools = self.$store.state.configdoc["securityTools"]["data"];
                         // self.request.datasource.spareParts = self.$store.state.configdoc["spareParts"]["data"];
@@ -398,12 +431,12 @@
                         this.query.datasource.companySource = self.toAddAll(this.$store.state.configdoc["companySource"]["data"]);
                         //self.toAddAll(self.query.datasource.companySource);
                         // this.request.datasource.companyAdmin = this.$store.state.configdoc["companyAdmin"]["data"];
-                        this.query.datasource.companyEmployee = self.toAddAll(this.$store.state.configdoc["companyEmployee"]["data"]);
+                        //this.query.datasource.companyEmployee = self.toAddAll(this.$store.state.configdoc["companyEmployee"]["data"]);
                         // self.query.datasource.companyEmployee.push({name:"All",attr:""});
                         // this.request.datasource.workItem = this.$store.state.configdoc["workItem"]["data"];
                         // self.request.datasource.securityTools = self.$store.state.configdoc["securityTools"]["data"];
                         // self.request.datasource.spareParts = self.$store.state.configdoc["spareParts"]["data"];
-                        this.query.datasource.workCategory = self.toAddAll(this.$store.state.configdoc["workCategory"]["data"]);
+                        //this.query.datasource.workCategory = self.toAddAll(this.$store.state.configdoc["workCategory"]["data"]);
                         //self.toAddAll(self.query.datasource.workCategory);
                     }
                     if (self.$store.state.curUser.isAdmin || self.$store.state.curUser.isAdminOffice) {
@@ -427,73 +460,23 @@
                     }
                 })
             },
-            setInitialCriteria: function() {
-                var self = this;
-                var criteria = {
-                    requestId: self.$store.state.qcriteria.requestId ? self.$store.state.qcriteria.requestId : "",
-                    company: self.$store.state.qcriteria.company ? self.$store.state.qcriteria.company : "",
-                    creationtime: self.$store.state.qcriteria.creationtime ? self.$store.state.qcriteria.creationtime : "",
-                    workers: self.$store.state.qcriteria.workers ? self.$store.state.qcriteria.workers : [],
-                    workCategory: self.$store.state.qcriteria.workCategory ? self.$store.state.qcriteria.workCategory : "",
-                    returntime: self.$store.state.qcriteria.returntime ? self.$store.state.qcriteria.returntime : ""
-                };
-                self.query.criteria = criteria;
-                self.queryWorkForm();
-            },
             initialRequestData: function() {
                 var self = this;
-                self.query.criteria.company = self.$store.state.curUser.company
-                self.handleCompanyChange(self.query.criteria.company);
-                if (self.$store.state.qcriteria !== "") {
-                    self.setInitialCriteria();
-                }
-    
+                self.query.criteria.company = [self.$store.state.curUser.company]
+                
             },
-            handleCompanyChange: function(value) {
-                var self = this;
-                if (value !== this.query.previousValue.company) {
-                    self.updateCompanyEmployee(value);
-                    self.updatecompanyAdmin(value);
-                    self.query.previousValue.company = value;
-                }
-            },
-            updateCompanyEmployee: function(value) {
-                this.query.criteria.workers=[];
-                var source = this.$store.state.configdoc["companyEmployee"]["data"];
-                var companyEmployeeSource = [{
-                    name: "All",
-                    attr: ""
-                }];
-                for (var i = 0; i < source.length; i++) {
-                    if (source[i].attr === value) {
-                        companyEmployeeSource.push(source[i]);
-                    }
-                }
-                this.$set(this.query.datasource, "companyEmployee", companyEmployeeSource);
-            },
-            updatecompanyAdmin: function(value) {
-                this.query.criteria.requester="";
-                var source = this.$store.state.configdoc["companyAdmin"]["data"];
-                var companyAdminSource = [{
-                    name: "All",
-                    attr: ""
-                }];
-                for (var i = 0; i < source.length; i++) {
-                    if (source[i].attr === value) {
-                        companyAdminSource.push(source[i]);
-                    }
-                }
-                this.$set(this.query.datasource, "companyAdmin", companyAdminSource);
-            },
-            handleEdit: function(index, row) {
-                this.$emit('RightComponentEvent', {
-                    data: row,
-                    viewName: "WorkFormDetail",
-                    class: "animated bounceInRight",
-                    menuitems: "WorkFormDetail",
-                    action: "Edit",
-                    previousView: "QueryWorkForm"
-                });
+            pringWorkForm:function(){
+                if(window.sessionStorage){
+                    sessionStorage.setItem("ToPrintMonthlyReportData",JSON.stringify(this.summaryTable));
+                    var path=window.location.protocol+"//"+window.location.host+"/printMonthlyReport";
+                    window.open(path);  
+                }else{
+                    this.$notify.error({
+                        title: 'Error',
+                        message: "你的浏览器不支持此功能，请升级"
+                    });
+                    return;
+                } 
             }
         }
     }

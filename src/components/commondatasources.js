@@ -65,5 +65,7 @@ export default {
     }
   ],
   "queryWorkform":[],
-  "queryWorker":[]
+  "queryWorker":[],
+  "queryMonthly":[],
+  "queryAnnually":[]
 }

@@ -51,7 +51,8 @@
     import WorkFormDetail from '@/components/WorkFormDetail'
     import QueryWorkForm from '@/components/QueryWorkForm'
     import QueryWorker from '@/components/QueryWorker'
-    
+    import QueryMonthly from '@/components/QueryMonthly'
+    import QueryAnnually from '@/components/QueryAnnually'
     
     export default {
         name: 'homelayout',
@@ -60,7 +61,9 @@
             WorkFormDetail,
             WorkForm,
             QueryWorkForm,
-            QueryWorker
+            QueryWorker,
+            QueryMonthly,
+            QueryAnnually
         },
         data: function() {
             return {
@@ -122,6 +125,16 @@
                             "viewName": "QueryWorker"
                         });
                         break;
+                    case "queryMonthly":
+                        this.switchViewEvent({
+                            "viewName": "QueryMonthly"
+                        });
+                        break;
+                    case "queryAnnually":
+                        this.switchViewEvent({
+                            "viewName": "QueryAnnually"
+                        });
+                        break;
                     default:
                         this.currentView = Home;
                 }
@@ -163,6 +176,16 @@
                         self.currentView = QueryWorker;
                         self.fullscreenLoading = false;
                         self.menuitems = commonDataSource.queryWorker;
+                        break;
+                    case "QueryMonthly":
+                        self.currentView = QueryMonthly;
+                        self.fullscreenLoading = false;
+                        self.menuitems = commonDataSource.queryMonthly;
+                        break;
+                    case "QueryAnnually":
+                        self.currentView = QueryAnnually;
+                        self.fullscreenLoading = false;
+                        self.menuitems = commonDataSource.queryAnnually;
                         break;
                     default:
                         self.fullscreenLoading = false;
