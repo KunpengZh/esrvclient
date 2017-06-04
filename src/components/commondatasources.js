@@ -46,6 +46,12 @@ export default {
       "pathname":"/spareParts",
       "menu":"备品备件",
       "event":"switchView"
+    },
+    {
+      "id":"0008",
+      "pathname":"/uploadExcel",
+      "menu":"上传Excel文件",
+      "event":"switchView"
     }
   ],
   "WorkForm":[

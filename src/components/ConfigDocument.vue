@@ -16,6 +16,7 @@
                 <el-menu-item v-show="showSecurityTools" index="2" @click="handleImport()">导入安全工具</el-menu-item>
                 <el-menu-item v-show="showSpareParts" index="1" @click="handleCreate()">新建备品备件</el-menu-item>
                 <el-menu-item v-show="showSpareParts" index="2" @click="handleImport()">导入备品备件</el-menu-item>
+                <el-menu-item v-show="showExcelUpload" index="2" @click="handleImport()">上传Excel文件</el-menu-item>
             </el-menu>
         </div>
         <div style="height:700px; padding:20px;">
@@ -140,6 +141,7 @@
                 showlevel2: false,
                 showlevel3: false,
                 showlevel4: false,
+                showExcelUpload:false,
                 showSecurityTools:false,
                 showSpareParts:false,
                 companySource: true,
@@ -278,6 +280,7 @@
             switchView: function(viewname) {
                         switch (viewname) {
                             case "/companySource":
+                                this.showExcelUpload=false;
                                 this.showSecurityTools=false;
                                 this.showSpareParts=false;
                                 this.companySource = true;
@@ -295,6 +298,7 @@
                                 //this.companyDataSource = this.buildConfigDataSource(this.$store.state.configdoc['companySource']['data']);
                                 break;
                             case "/companyAdmin":
+                                this.showExcelUpload=false;
                                 this.showSecurityTools=false;
                                 this.showSpareParts=false;
                                 this.companySource = false;
@@ -312,6 +316,7 @@
                                 this.companyDataSource = this.buildConfigDataSource(this.$store.state.configdoc['companySource']['data']);
                                 break;
                             case "/companyEmployee":
+                                this.showExcelUpload=false;
                                 this.showSecurityTools=false;
                                 this.showSpareParts=false;
                                 this.companySource = false;
@@ -329,6 +334,7 @@
                                 this.companyDataSource = this.buildConfigDataSource(this.$store.state.configdoc['companySource']['data']);
                                 break;
                             case "/workItem":
+                                this.showExcelUpload=false;
                                 this.showSecurityTools=false;
                                 this.showSpareParts=false;
                                 this.companySource = false;
@@ -347,6 +353,7 @@
                                 this.workCategoryDataSource = this.buildConfigDataSource(this.$store.state.configdoc['workCategory']['data']);
                                 break;
                             case "/showWorkCategory":
+                                this.showExcelUpload=false;
                                 this.showSecurityTools=false;
                                 this.showSpareParts=false;
                                 this.companySource = false;
@@ -364,6 +371,7 @@
                                 //this.companyDataSource = this.buildConfigDataSource(this.$store.state.configdoc['companySource']['data']);
                                 break;
                             case "/securityTools":
+                                this.showExcelUpload=false;
                                 this.companySource = false;
                                 this.companyAdmin = false;
                                 this.companyEmployee = false;
@@ -381,6 +389,7 @@
                                 //this.companyDataSource = this.buildConfigDataSource(this.$store.state.configdoc['companySource']['data']);
                                 break;
                             case "/spareParts":
+                                this.showExcelUpload=false;
                                 this.companySource = false;
                                 this.companyAdmin = false;
                                 this.companyEmployee = false;
@@ -397,7 +406,27 @@
                                 this.ConfigDataSource = this.buildConfigDataSource(this.$store.state.configdoc['spareParts']['data']);
                                 //this.companyDataSource = this.buildConfigDataSource(this.$store.state.configdoc['companySource']['data']);
                                 break;
+                            case "/uploadExcel":
+                                this.showExcelUpload=true;
+                                this.companySource = false;
+                                this.companyAdmin = false;
+                                this.companyEmployee = false;
+                                this.workItem = false;
+                                this.showWorkCategory = false;
+                                this.showSecurityTools=false;
+                                this.showSpareParts=false;
+                                this.currentCategory = "uploadExcel";
+                                this.uplaodDialogTitle = "上传Excel文件";
+                                this.collabel = "Excel文件";
+                                this.showlevel2 = false;
+                                this.showlevel3 = false;
+                                this.showlevel4 = false;
+                                this.ConfigDataSource = this.buildConfigDataSource();
+                                this.handleImport();
+                                //this.companyDataSource = this.buildConfigDataSource(this.$store.state.configdoc['companySource']['data']);
+                                break;
                             default:
+                                this.showExcelUpload=false;
                                 this.companySource = true;
                                 this.companyAdmin = false;
                                 this.companyEmployee = false;
@@ -419,11 +448,38 @@
                         this.fullscreenLoading = true;
                     },
                     onSuccess: function(response) {
+                        console.log("Hi, the response" + response);
+                        // console.log("right event")
                         this.fullscreenLoading = false;
-                        this.$emit('switchViewEvent', {
-                            data: response,
-                            "viewName": "ForcastTableView"
-                        });
+                        // this.$emit('switchViewEvent', {
+                        //     data: response,
+                        //     "viewName": "ForcastTableView"
+                        // });
+                        if(response.message){
+                            this.$notify.error({
+                                title: 'Error',
+                                message: '上传更新配置文件错误:' + response.message
+                            });
+                        }else{
+                            this.$notify.info({
+                                title: 'Info',
+                                message: '上传更新配置文件成功'
+                            });
+                            this.dialogFormVisible=false;
+                            this.loadConfigData();
+                        }
+                    },
+                    loadConfigData: function(callback) {
+                        this.$http.get('/esrvapi/getallconfigdoc').then(function(res) {
+                            var docList = res.body;
+                            for (var i = 0; i < docList.length; i++) {
+                                var key = docList[i].category;
+                                this.$store.state.configdoc[key] = docList[i]
+                            }
+                            if (callback) {
+                                callback();
+                            }
+                        })
                     },
                     handleEditSave: function() {
                         if (this.newTextInput === "") {

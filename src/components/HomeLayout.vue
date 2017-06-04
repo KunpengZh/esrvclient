@@ -6,12 +6,12 @@
                     <img class="commentAvatarImage" src="/imgs/elpower.png">
                 </div>
             </el-col>
-            <el-col :span="4">
+            <el-col :span="3">
                 <div class="appTitle">
                     <span>献县供电派工单系统</span>
                 </div>
             </el-col>
-            <el-col :span="16" style="height:60px;">
+            <el-col :span="18" style="height:60px;">
                 <ul class="headerPrimaryActionsTrailing">
                     <li class="menuUser" v-for="menuitem in menuitems" :key="menuitem.id">
                         <div class="menuOptions">
@@ -20,7 +20,7 @@
                     </li>
                 </ul>
             </el-col>
-            <el-col :span="2" style="height:60px;">
+            <el-col :span="1" style="height:60px;">
                 <div id="logoutdiv">
                     <el-button type="text" class="el-icon-menu" style="color:white;" v-on:click="logout">&nbsp&nbsp&nbsp退出</el-button>
                 </div>
@@ -76,6 +76,7 @@
         },
         methods: {
             RightComponentEvent: function(options) {
+                console.log("right event")
                 this.opt.data = options.data;
                 this.opt.action = options.action;
                 this.opt.previousView = options.previousView;
@@ -277,8 +278,8 @@
         list-style: none;
         margin: 0;
         padding: 0;
-        padding-right: 30px;
-        text-align: right;
+        padding-right: 20px;
+        text-align: center;
         text-decoration: none;
     }
     
@@ -288,13 +289,14 @@
     
     .menuUser,
     .menuUser>div {
-        padding-right: 30px;
+        padding-right: 15px;
     }
     
     .menuUser .menuOptions {
         height: 60px;
         line-height: 60px;
         font-size: 14px;
+        font-weight:500;
     }
     
     #logoutdiv {
