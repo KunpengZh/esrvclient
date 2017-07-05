@@ -21,21 +21,21 @@
         </div>
         <div style="height:700px; padding:20px;">
             <el-table :data="ConfigDataSource" border style="width: 100%" max-height="650">
-                <el-table-column prop="id" label="行序号" label-class-name="forcastHeader">
+                <el-table-column prop="id" sortable label="行序号" label-class-name="forcastHeader">
                 </el-table-column>
-                <el-table-column prop="name" :label="collabel" label-class-name="forcastHeader">
+                <el-table-column prop="name" sortable :label="collabel" label-class-name="forcastHeader">
                 </el-table-column>
-                <el-table-column v-if="showlevel2" prop="attr" :label="col2label" label-class-name="forcastHeader">
+                <el-table-column v-if="showlevel2" sortable prop="attr" :label="col2label" label-class-name="forcastHeader">
                 </el-table-column>
                 <el-table-column v-if="showlevel3" prop="attr" :label="col3label" label-class-name="forcastHeader">
                 </el-table-column>
-                <el-table-column v-if="showlevel4" prop="workCategory" :label="col4label" label-class-name="forcastHeader">
+                <el-table-column v-if="showlevel4" sortable prop="workCategory" :label="col4label" label-class-name="forcastHeader">
                 </el-table-column>
                 <el-table-column label="操作">
                     <template scope="scope">
                          <el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
                          <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
-</template>
+                    </template>
                 </el-table-column>
             </el-table>
         </div>
@@ -160,7 +160,9 @@
                 attr: '',
                 workCategory: '',
                 newTextInputList: [],
-                originalText: ''
+                originalText: '',
+                originalworkCategory:'',
+                originalAttr:''
             }
         },
         mounted: function() {
@@ -185,6 +187,8 @@
                 this.isCreateModel = false;
                 this.isEditModel = false;
                 this.originalText = '';
+                this.originalworkCategory='';
+                this.originalAttr='';
                 // this.showlevel2 = false;
                 // this.showlevel3 = false;
             },
@@ -508,15 +512,38 @@
                         var curSource = this.$store.state.configdoc[this.currentCategory]['data']
                         var needupdate = false;
                         for (let i = 0; i < curSource.length; i++) {
-                            if (curSource[i]["name"] === this.originalText) {
-                                curSource[i]['name'] = this.newTextInput;
-                                curSource[i]['attr'] = this.attr;
-                                if (this.showlevel4){
-                                    curSource[i]['workCategory']=this.workCategory;
+                            if(this.currentCategory === "workItem"){
+                                if (curSource[i]["name"] === this.originalText && curSource[i]["workCategory"] === this.originalworkCategory) {
+                                    curSource[i]['name'] = this.newTextInput;
+                                    curSource[i]['attr'] = this.attr;
+                                    if (this.showlevel4){
+                                        curSource[i]['workCategory']=this.workCategory;
+                                    }
+                                    needupdate = true;
+                                    break;
                                 }
-                                needupdate = true;
-                                break;
+                            }else if(this.currentCategory === "companyEmployee" ){
+                                if (curSource[i]["name"] === this.originalText && curSource[i]["attr"] === this.originalAttr) {
+                                    curSource[i]['name'] = this.newTextInput;
+                                    curSource[i]['attr'] = this.attr;
+                                    if (this.showlevel4){
+                                        curSource[i]['workCategory']=this.workCategory;
+                                    }
+                                    needupdate = true;
+                                    break;
+                                }
+                            }else{
+                                if (curSource[i]["name"] === this.originalText) {
+                                    curSource[i]['name'] = this.newTextInput;
+                                    curSource[i]['attr'] = this.attr;
+                                    if (this.showlevel4){
+                                        curSource[i]['workCategory']=this.workCategory;
+                                    }
+                                    needupdate = true;
+                                    break;
+                                }
                             }
+                            
                         }
                         if (!needupdate) {
                             this.$notify.info({
@@ -559,6 +586,8 @@
                         this.newCreateDialogTitle = "编辑" + this.collabel;
                         this.newTextInput = row.name;
                         this.originalText = row.name;
+                        this.originalworkCategory=row.workCategory;
+                        this.originalAttr=row.attr;
                         this.attr = row.attr;
                         this.workCategory=row.workCategory;
                         this.isCreateModel = false;
@@ -569,11 +598,28 @@
                         var curSource = this.$store.state.configdoc[this.currentCategory]['data']
                         var needupdate = false;
                         for (let i = 0; i < curSource.length; i++) {
-                            if (curSource[i]["name"] === row.name) {
-                                curSource.splice(i, 1);
-                                needupdate = true;
-                                break;
+                            if(this.currentCategory === "workItem"){
+                                if (curSource[i]["name"] === this.originalText && curSource[i]["workCategory"] === this.originalworkCategory) {
+                                    curSource.splice(i, 1);
+                                    needupdate = true;
+                                    break;
+                                }
+
+                            }else if(this.currentCategory === "companyEmployee" ){
+                                if (curSource[i]["name"] === this.originalText && curSource[i]["attr"] === this.originalAttr) {
+                                    curSource.splice(i, 1);
+                                    needupdate = true;
+                                    break;
+                                }
+
+                            }else{
+                                if (curSource[i]["name"] === row.name) {
+                                    curSource.splice(i, 1);
+                                    needupdate = true;
+                                    break;
+                                }
                             }
+                            
                         }
                         if (!needupdate) {
                             this.$notify.info({
