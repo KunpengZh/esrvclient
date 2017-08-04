@@ -58,7 +58,13 @@ export default {
     {
       "id":"0001",
       "pathname":"/createrequest",
-      "menu":"新建派工单",
+      "menu":"新建日常派工单",
+      "event":"switchView"
+    },
+    {
+      "id":"0002",
+      "pathname":"/createemergencyrequest",
+      "menu":"新建紧急派工单",
       "event":"switchView"
     }
   ],

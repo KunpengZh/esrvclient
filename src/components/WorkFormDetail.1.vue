@@ -27,10 +27,7 @@
                         </el-select>
                     </td>
                     <td width="10%">{{request.label.creationtime}}</td>
-                    <td width="25%">
-                        <el-date-picker :disabled="!isEmergency" v-model="request.data.creationtime" format="yyyy-MM-dd HH:mm:ss" align="right" type="datetime">
-                        </el-date-picker>
-                    </td>
+                    <td width="25%">{{request.data.creationtime}}</td>
                 </tr>
                 <tr>
                     <td>{{request.label.workers}}</td>
@@ -183,9 +180,7 @@
         name: 'WorkFormDetail',
         props: ["options"],
         data() {
-            
             return {
-                isEmergency:this.options.isEmergency,
                 previousView:this.options.previousView,
                 isWorkFormClosed: false,
                 isEdithModel: false,

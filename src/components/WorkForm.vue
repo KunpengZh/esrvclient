@@ -98,7 +98,13 @@
                     previousView:"WorkForm"
                 });
             },
-            switchView: function() {
+            switchView: function(viewname) {
+                var isEmergency=false;
+                
+                if(viewname==="/createemergencyrequest"){
+                    isEmergency=true;
+                }
+                
                 this.$emit('RightComponentEvent', {
                     data: {
                         requestId: "",
@@ -122,12 +128,12 @@
                         isSecurityTools: "",
                         sanPiaoZhiXing: "",
                     },
-                    viewName: "WorkFormDetail",
                     class: "animated bounceInRight",
                     menuitems: "WorkFormDetail",
                     viewName:"WorkFormDetail",
                     previousView:"WorkForm",
-                    action: "Create"
+                    action: "Create",
+                    isEmergency:isEmergency
                 });
             }
         }

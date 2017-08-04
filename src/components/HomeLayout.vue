@@ -76,7 +76,7 @@
         },
         methods: {
             RightComponentEvent: function(options) {
-                console.log("right event")
+                
                 this.opt.data = options.data;
                 this.opt.action = options.action;
                 this.opt.previousView = options.previousView;
@@ -84,6 +84,12 @@
                 if (options.menuitems) {
                     this.menuitems = commonDataSource[options.menuitems];
                 }
+                if (options.isEmergency) {
+                    this.opt.isEmergency = options.isEmergency;
+                }else{
+                    this.opt.isEmergency=false;
+                }
+                
                 this.currentView = options.viewName;
             },
             LeftSideBarEvent: function(viewName) {
@@ -114,6 +120,11 @@
                     case "workform":
                         this.switchViewEvent({
                             "viewName": "WorkForm"
+                        });
+                        break;
+                    case "emergencyworkform":
+                        this.switchViewEvent({
+                            "viewName": "EmerencyWorkForm"
                         });
                         break;
                     case "queryWorkform":
