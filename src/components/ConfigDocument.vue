@@ -452,13 +452,7 @@
                         this.fullscreenLoading = true;
                     },
                     onSuccess: function(response) {
-                        console.log("Hi, the response" + response);
-                        // console.log("right event")
                         this.fullscreenLoading = false;
-                        // this.$emit('switchViewEvent', {
-                        //     data: response,
-                        //     "viewName": "ForcastTableView"
-                        // });
                         if(response.message){
                             this.$notify.error({
                                 title: 'Error',

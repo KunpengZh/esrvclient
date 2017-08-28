@@ -1,5 +1,5 @@
 <template>
-    <div class="homediv" >
+    <div class="homediv">
         <el-row>
             <el-col :span="3" :offset="2">
                 <div class="commentAvatarDivBig">
@@ -34,7 +34,7 @@
                     </el-form-item>
                     <el-form-item>
                         <el-button type="primary" @click="onSubmit">登陆</el-button>
-                         <el-button>取消</el-button>
+                        <el-button>取消</el-button>
                     </el-form-item>
                 </el-form>
             </el-col>
@@ -43,46 +43,48 @@
 </template>
 
 <script>
-export default {
-    name:'login',
-    data: function () {
-        return {
-            username: '',
-            password: '',
-            errorMsg:''
-        }
-    },
-    methods:{
-        onSubmit:function(){
-            let options = { emulateJSON: true };
-            this.$http.post("/login",{"username":this.username,"password":this.password},options).then(function(response) {
-               if(response.body && response.body.isAuthenticated){
-                    this.$store.state.curUser.username=response.body.username;
-                    this.$store.state.curUser.isAuthenticated=response.body.isAuthenticated;
-                    this.$store.state.curUser.role=response.body.role;
-                    this.$store.state.curUser.fullname=response.body.fullname;
-                    this.$store.state.curUser.company=response.body.company;
-                    this.$store.state.curUser.isAdmin = response.body.role==="Admin"?true:false;
-                    this.$store.state.curUser.isAdminOffice = response.body.role==="AdminOffice"?true:false;
-                    // if(response.body.role==="Admin"){
-                    //     this.$store.state.curUser.isAdmin=true;
-                    // }else{
-                    //     this.$store.state.curUser.isAdmin=false;
-                    // }
-                   this.$router.push({
-                        path: '/home'
-                    })
-               }else if(response.body && response.body.message){
-                    this.errorMsg=response.body.message;
-               }
-            });
+    export default {
+        name: 'login',
+        data: function() {
+            return {
+                username: '',
+                password: '',
+                errorMsg: ''
+            }
+        },
+        methods: {
+            onSubmit: function() {
+                let options = {
+                    emulateJSON: true
+                };
+                this.$http.post("/login", {
+                    "username": this.username,
+                    "password": this.password
+                }, options).then(function(response) {
+                    if (response.body && response.body.isAuthenticated) {
+                        this.$store.state.curUser.username = response.body.username;
+                        this.$store.state.curUser.isAuthenticated = response.body.isAuthenticated;
+                        this.$store.state.curUser.role = response.body.role;
+                        this.$store.state.curUser.fullname = response.body.fullname;
+                        this.$store.state.curUser.company = response.body.company;
+                        this.$store.state.curUser.isAdmin = response.body.role === "Admin" ? true : false;
+                        this.$store.state.curUser.isAdminOffice = response.body.role === "AdminOffice" ? true : false;
+                        this.$store.state.curUser.isCompanyAdmin = response.body.role === "CompanyAdmin" ? true : false;
+                        this.$router.push({
+                            path: '/home'
+                        })
+                    } else if (response.body && response.body.message) {
+                        this.errorMsg = response.body.message;
+                    }
+                });
+            }
         }
     }
-}
 </script>
+
 <style>
-.homediv {
-    padding: 30px;
-    margin-top:100px;
-}
+    .homediv {
+        padding: 30px;
+        margin-top: 100px;
+    }
 </style>

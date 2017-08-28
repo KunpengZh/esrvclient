@@ -43,7 +43,6 @@
 
 <script>
     import leftSideBar from '@/components/LeftSideBar'
-    import Home from '@/components/Home'
     import UserManager from '@/components/UserManager'
     import ConfigDocument from '@/components/ConfigDocument'
     import commonDataSource from '@/components/commondatasources'
@@ -70,19 +69,20 @@
                 fullscreenLoading: false,
                 currentView: WorkForm,
                 opt: {},
-                menuitems: commonDataSource.WorkForm,
+                menuitems: commonDataSource.AdminRolesName.indexOf(this.$store.state.curUser.role)>=0?commonDataSource.WorkForm:[],
                 rightComponentClass: "animated bounceInDown"
             }
         },
         methods: {
             RightComponentEvent: function(options) {
-                
                 this.opt.data = options.data;
                 this.opt.action = options.action;
                 this.opt.previousView = options.previousView;
                 this.rightComponentClass = options.class;
                 if (options.menuitems) {
                     this.menuitems = commonDataSource[options.menuitems];
+                }else{
+                    this.menuitems=[];
                 }
                 if (options.isEmergency) {
                     this.opt.isEmergency = options.isEmergency;
@@ -290,7 +290,7 @@
         margin: 0;
         padding: 0;
         padding-right: 20px;
-        text-align: center;
+        text-align: right;
         text-decoration: none;
     }
     

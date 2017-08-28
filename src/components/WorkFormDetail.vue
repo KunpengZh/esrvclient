@@ -33,21 +33,20 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>{{request.label.chargerName}}</td>
+                    <td style="text-align: left;">
+                        <el-select :disabled="isEdithModel && !isHistoryRecord" filterable v-model="request.data.chargerName">
+                            <el-option v-for="workers in request.datasource.companyEmployee" :label="workers.name" :value="workers.name" :key="workers.name"></el-option>
+                        </el-select>
+                    </td>
                     <td>{{request.label.workers}}</td>
                     <td style="text-align: left;">
                         <el-select :disabled="isEdithModel" filterable multiple v-model="request.data.workers" style="width:100%">
                             <el-option v-for="workers in request.datasource.companyEmployee" :label="workers.name" :value="workers.name" :key="workers.name"></el-option>
                         </el-select>
                     </td>
-                    <td>{{request.label.workhour}}</td>
-                    <td>
-                        <el-input :disabled="isCreateModel || isWorkFormClosed" v-model="request.data.workhour" placeholder="请输入工作小时数" style="width:80%" v-on:change="handleWorkhourInput"></el-input>
-                    </td>
-                    <td>{{request.label.planreturntime}}</td>
-                    <td>
-                        <el-date-picker :disabled="isEdithModel" v-model="request.data.planreturntime" format="yyyy-MM-dd HH:mm:ss" align="right" type="datetime" placeholder="选择实际返回时间">
-                        </el-date-picker>
-                    </td>
+                    <td>{{request.label.workersnumber}}</td>
+                    <td>{{workersnumber}}</td>
                 </tr>
                 <tr>
                     <td>{{request.label.workCategory}}</td>
@@ -62,66 +61,74 @@
                             <el-option v-for="workitem in request.datasource.workItem" :label="workitem.name" :value="workitem.name" :key="workitem.name"></el-option>
                         </el-select>
                     </td>
-                    <td>{{request.label.workersnumber}}</td>
-                    <td>{{workersnumber}}</td>
+                    <td>{{request.label.workhour}}</td>
+                    <td>
+                        <el-input :disabled="isCreateModel || isWorkFormClosed || (isEdithModel && !isChargePerson)" v-model="request.data.workhour" placeholder="请输入工作小时数" style="width:80%" v-on:change="handleWorkhourInput"></el-input>
+                    </td>
+                    
                 </tr>
-                <td>{{request.label.isSecurityTools}}</td>
-                <td>
-                    <template>
-                        <el-radio-group v-model="request.data.isSecurityTools" v-on:change="handleSecurityToolsChange">
-                                <el-radio :disabled="isEdithModel" class="radio"   label="Yes">是</el-radio>
-                                <el-radio :disabled="isEdithModel" class="radio"   label="No">否</el-radio>
-                        </el-radio-group>
-                    </template>
-                </td>
-                <td>{{request.label.isSpareParts}}</td>
-                <td>
-                    <template>
-                        <el-radio-group v-model="request.data.isSpareParts" v-on:change="handleSparePartsChange">
+                <tr>
+                    <td>{{request.label.isSecurityTools}}</td>
+                    <td>
+                        <template>
+                            <el-radio-group v-model="request.data.isSecurityTools" v-on:change="handleSecurityToolsChange">
+                                    <el-radio :disabled="isEdithModel" class="radio"   label="Yes">是</el-radio>
+                                    <el-radio :disabled="isEdithModel" class="radio"   label="No">否</el-radio>
+                            </el-radio-group>
+                        </template>
+                    </td>
+                    <td>{{request.label.isSpareParts}}</td>
+                    <td>
+                        <template>
+                            <el-radio-group v-model="request.data.isSpareParts" v-on:change="handleSparePartsChange">
+                                <el-radio :disabled="isEdithModel" class="radio" label="Yes">是</el-radio>
+                                <el-radio :disabled="isEdithModel" class="radio" label="No">否</el-radio>
+                            </el-radio-group>
+                        </template>
+                    </td>
+                    <td>{{request.label.sanPiaoZhiXing}}</td>
+                    <td>
+                        <template>
+                        <el-radio-group v-model="request.data.sanPiaoZhiXing">
                             <el-radio :disabled="isEdithModel" class="radio" label="Yes">是</el-radio>
                             <el-radio :disabled="isEdithModel" class="radio" label="No">否</el-radio>
                         </el-radio-group>
-                    </template>
-                </td>
-                <td>{{request.label.sanPiaoZhiXing}}</td>
-                <td>
-                    <template>
-                    <el-radio-group v-model="request.data.sanPiaoZhiXing">
-                        <el-radio :disabled="isEdithModel" class="radio" label="Yes">是</el-radio>
-                        <el-radio :disabled="isEdithModel" class="radio" label="No">否</el-radio>
-                    </el-radio-group>
-                    </template>
-                </td>
-                <tr>
+                        </template>
+                    </td>
                 </tr>
                 <tr>
-                <td>{{request.label.securityTools}}</td>
-                <td>
-                    <el-select :disabled="isEdithModel || lockSecurityTools" filterable multiple v-model="request.data.securityTools" style="width:100%">
-                            <el-option v-for="tool in request.datasource.securityTools" :label="tool.name" :value="tool.name" :key="tool.name"></el-option>
-                    </el-select>
-                </td>
-                <td>{{request.label.spareParts}}</td>
-                <td colspan="3">
-                    <el-select :disabled="isEdithModel || lockSpareParts" filterable multiple v-model="request.data.spareParts" style="width:100%">
-                            <el-option v-for="part in request.datasource.spareParts" :label="part.name" :value="part.name" :key="part.name"></el-option>
-                    </el-select>
-                </td>
+                    <td>{{request.label.securityTools}}</td>
+                    <td>
+                        <el-select :disabled="isEdithModel || lockSecurityTools" filterable multiple v-model="request.data.securityTools" style="width:100%">
+                                <el-option v-for="tool in request.datasource.securityTools" :label="tool.name" :value="tool.name" :key="tool.name"></el-option>
+                        </el-select>
+                    </td>
+                    <td>{{request.label.spareParts}}</td>
+                    <td>
+                        <el-select :disabled="isEdithModel || lockSpareParts" filterable multiple v-model="request.data.spareParts" style="width:100%">
+                                <el-option v-for="part in request.datasource.spareParts" :label="part.name" :value="part.name" :key="part.name"></el-option>
+                        </el-select>
+                    </td>
+                    <td>{{request.label.planreturntime}}</td>
+                    <td>
+                        <el-date-picker :disabled="isEdithModel" v-model="request.data.planreturntime" format="yyyy-MM-dd HH:mm:ss" align="right" type="datetime" placeholder="选择计划返回时间">
+                        </el-date-picker>
+                    </td>
                 </tr>
                 <tr>
                     <td>{{request.label.worklocation}}</td>
                     <td colspan="3">
-                        <el-input :disabled="isWorkFormClosed" v-model="request.data.worklocation" placeholder="请输入工作地点"></el-input>
+                        <el-input :disabled="isWorkFormClosed || (isEdithModel && !isChargePerson)" v-model="request.data.worklocation" placeholder="请输入工作地点"></el-input>
                     </td>
                     <td>{{request.label.returntime}}</td>
                     <td>
-                        <el-date-picker :disabled="isWorkFormClosed || !isEdithModel" @change="calculateWorkHour" v-model="request.data.returntime" format="yyyy-MM-dd HH:mm:ss" align="right" type="datetime" placeholder="选择返回时间">
+                        <el-date-picker :disabled="isWorkFormClosed || !isEdithModel || (isEdithModel && !isChargePerson)" @change="calculateWorkHour" v-model="request.data.returntime" format="yyyy-MM-dd HH:mm:ss" align="right" type="datetime" placeholder="选择返回时间">
                         </el-date-picker>
                     </td>
                 </tr>
                 <tr>
                     <td colspan="6">
-                        <el-input type="textarea" :disabled="isWorkFormClosed" :rows="2" placeholder="工作主要内容" v-model="request.data.workcomments">
+                        <el-input type="textarea" :disabled="isWorkFormClosed || (isEdithModel && !isChargePerson)" :rows="2" placeholder="工作主要内容" v-model="request.data.workcomments">
                         </el-input>
                     </td>
                 </tr>
@@ -131,10 +138,10 @@
             <el-col :span="24">
                 <el-button type="primary" @click="pringWorkForm()">打印预览</el-button>
                 <el-button type="primary" @click="saveAndCreateNew()" v-show="isCreateModel">保存并创建新单</el-button>
-                <el-button type="primary" @click="showUploadDialog()" v-show="isEdithModel && !isWorkFormClosed">上传照片</el-button>
-                <el-button type="primary" @click="saveRequest()" v-show="isCreateModel || (isEdithModel && !isWorkFormClosed)">保存退出</el-button>
-                <el-button type="primary" @click="completeRequestForm()" v-show="isEdithModel && !isWorkFormClosed">完成工单</el-button>
-                <el-button type="warning" @click="returnData()" v-show="isCreateModel || (isEdithModel && !isWorkFormClosed)">取 消</el-button>
+                <el-button type="primary" @click="showUploadDialog()" v-show="isEdithModel && !isWorkFormClosed && isChargePerson">上传照片</el-button>
+                <el-button type="primary" @click="saveRequest()" v-show="isCreateModel || (isEdithModel && !isWorkFormClosed && isChargePerson)">保存退出</el-button>
+                <el-button type="primary" @click="completeRequestForm()" v-show="isEdithModel && !isWorkFormClosed && isChargePerson">完成工单</el-button>
+                <el-button type="warning" @click="returnData()" v-show="isCreateModel || (isEdithModel && !isWorkFormClosed && isChargePerson)">取 消</el-button>
             </el-col>
         </el-row>
         <el-row style="border:1px solid #ccc; margin-top:10px;">
@@ -179,16 +186,18 @@
 </template>
 
 <script>
+    import commonDataSource from '@/components/commondatasources';
     export default {
         name: 'WorkFormDetail',
         props: ["options"],
         data() {
-            
             return {
                 isEmergency:this.options.isEmergency,
                 previousView:this.options.previousView,
                 isWorkFormClosed: false,
                 isEdithModel: false,
+                isChargePerson:true,
+                isHistoryRecord:false,
                 dialogFormVisible: false,
                 action: this.options.action,
                 isCreateModel: false,
@@ -215,7 +224,8 @@
                         isSpareParts: "领取备品备件",
                         securityTools: "安全工具",
                         spareParts: "备品备件",
-                        sanPiaoZhiXing: "三票执行"
+                        sanPiaoZhiXing: "三票执行",
+                        chargerName:"主负责人"
                     },
                     data: this.options.data,
                     datasource: {
@@ -284,6 +294,19 @@
                 if (self.action === "Edit") {
                     self.isCreateModel = false;
                     self.isEdithModel = true;
+
+                    if(!self.request.data.chargerID || self.request.data.chargerID===''){
+                        self.isChargePerson=true;
+                        self.isHistoryRecord=true;
+                        self.updateCompanyEmployee(self.request.data.company);
+                    }else if (self.request.data.chargerID!==self.$store.state.curUser.username){
+                        self.isChargePerson=false;
+                    }
+                    
+                    if(self.$store.state.curUser.isAdminOffice || self.$store.state.curUser.isAdmin || self.$store.state.curUser.isCompanyAdmin){
+                        self.isChargePerson=true;
+                    }
+
                     if (self.request.data.requestStatus === "Closed") {
                         self.isWorkFormClosed = true;
                     } else {
@@ -294,7 +317,7 @@
                     self.isCreateModel = true;
                     self.isWorkFormClosed = false;
                     self.isEdithModel = false;
-                    if(self.$store.state.curUser.isAdminOffice || self.$store.state.curUser.isAdmin){
+                    if(self.$store.state.curUser.isAdminOffice || self.$store.state.curUser.isAdmin || self.$store.state.curUserisCompanyAdmin){
                         self.isAdmin=true;
                     }else{
                         self.isAdmin=false;
@@ -466,59 +489,102 @@
                 if (!this.validateRequestForm()) {
                     return;
                 }
-                this.$http.post("/workformapi/save", {
-                    data: this.request.data
-                }).then(function(res) {
-                    if (res.status === 200 && res.body.requestId) {
-                        this.$notify.info({
-                            title: '保存成功',
-                            message: "保存成功"
-                        });
-                        self.request.data = {
-                            requestId: "",
-                            company: self.request.data.company,
-                            requester: self.request.data.requester,
-                            creationtime: "",
-                            workitem: "",
-                            workCategory: "",
-                            worklocation: "",
-                            workers: [],
-                            workersnumber: "",
-                            workhour: "",
-                            planreturntime: "",
-                            returntime: "",
-                            workcomments: "",
-                            workdocument: [],
-                            requestStatus: "New",
-                            securityTools: [],
-                            spareParts: [],
-                            isSpareParts: "",
-                            isSecurityTools: "",
-                            sanPiaoZhiXing: ""
-                        }
-                        //this.request.datasource.companyAdmin = [];
-                        //this.request.datasource.companyEmployee = [];
-                        this.request.datasource.workItem = [];
-                        self.$http.get('/workformapi/requestid').then(function(res) {
-                            var strbody = res.body;
-                            if (!strbody.requestId || !strbody.strtime) {
-                                this.$notify.error({
-                                    title: 'Error',
-                                    message: "未能从服务器取得派工单编号"
-                                });
-                                return;
+                this.validateChargePerson(function(){
+                    
+                    self.$http.post("/workformapi/save", {
+                        data: self.request.data
+                    }).then(function(res) {
+                        if (res.status === 200 && res.body.requestId) {
+                            self.$notify.info({
+                                title: '保存成功',
+                                message: "保存成功"
+                            });
+                            self.request.data = {
+                                requestId: "",
+                                company: self.request.data.company,
+                                requester: self.request.data.requester,
+                                creationtime: "",
+                                workitem: "",
+                                workCategory: "",
+                                worklocation: "",
+                                workers: [],
+                                workersnumber: "",
+                                workhour: "",
+                                planreturntime: "",
+                                returntime: "",
+                                workcomments: "",
+                                workdocument: [],
+                                requestStatus: "New",
+                                securityTools: [],
+                                spareParts: [],
+                                isSpareParts: "",
+                                isSecurityTools: "",
+                                sanPiaoZhiXing: "",
+                                chargerName:"",
+                                chargerID:""
                             }
-                            self.request.data.creationtime = strbody.strtime;
-                            self.request.data.requestId = strbody.requestId;
-                        })
-                    } else {
-                        this.$notify.error({
+                            //this.request.datasource.companyAdmin = [];
+                            //this.request.datasource.companyEmployee = [];
+                            self.request.datasource.workItem = [];
+                            self.$http.get('/workformapi/requestid').then(function(res) {
+                                var strbody = res.body;
+                                if (!strbody.requestId || !strbody.strtime) {
+                                    self.$notify.error({
+                                        title: 'Error',
+                                        message: "未能从服务器取得派工单编号"
+                                    });
+                                    return;
+                                }
+                                self.request.data.creationtime = strbody.strtime;
+                                self.request.data.requestId = strbody.requestId;
+                            })
+                        } else {
+                            self.$notify.error({
+                                title: 'Error',
+                                message: res.body
+                            });
+                            return;
+                        }
+                    });
+                })
+            },
+            validateChargePerson:function(callback){
+                var self = this;
+                var condition={
+                    "fullname":this.request.data.chargerName,
+                    "company":this.request.data.company,
+                };
+                this.$http.post("/esrvapi/queryuser", {
+                    condition: condition
+                }).then(function(res) {
+                    if (res.status === 200){
+                       
+                        res=res.body;
+                       
+                         if (res.status === 800){
+                             self.$notify.error({
+                                title: 'Error',
+                                message: "你所选的工单主负责人，没有一个有效的登陆ID,所以不能做为主负责人，请更换"
+                            });
+                            return;
+                         }else if (res.status === 500){
+                              self.$notify.error({
+                                title: 'Error',
+                                message: res.message
+                            });
+                         }else if (res.status === 200){
+                            
+                             self.request.data.chargerID=res.data.username;
+                             callback()
+                         }
+                    }else {
+                        self.$notify.error({
                             title: 'Error',
                             message: res.body
                         });
                         return;
                     }
-                });
+                })
             },
             saveRequest: function() {
                 var self = this;
@@ -526,30 +592,32 @@
                 if (!this.validateRequestForm()) {
                     return;
                 }
-                this.$http.post("/workformapi/save", {
-                    data: this.request.data
-                }).then(function(res) {
-                    if (res.status === 200 && res.body.requestId) {
-                        this.$notify.info({
-                            title: '保存成功',
-                            message: "保存成功"
-                        });
-                        this.returnData(res.body);
-                    } else {
-                        this.$notify.error({
-                            title: 'Error',
-                            message: res.body
-                        });
-                        return;
-                    }
-                });
+                this.validateChargePerson(function(){
+                    self.$http.post("/workformapi/save", {
+                        data: self.request.data
+                    }).then(function(res) {
+                        if (res.status === 200 && res.body.requestId) {
+                            self.$notify.info({
+                                title: '保存成功',
+                                message: "保存成功"
+                            });
+                            self.returnData(res.body);
+                        } else {
+                            self.$notify.error({
+                                title: 'Error',
+                                message: res.body
+                            });
+                            return;
+                        }
+                    });
+                })
             },
             returnData: function(data) {
                 var returnOpt={
                     data: data,
                     viewName: this.previousView,
                     class: "animated bounceInLeft",
-                    menuitems: "WorkForm",
+                    menuitems: commonDataSource.AdminRolesName.indexOf(this.$store.state.curUser.role)>=0?"WorkForm":false,
                     previousView:"WorkFormDetail"
                 };
                 this.$emit('RightComponentEvent',returnOpt );
@@ -574,6 +642,14 @@
                     this.$notify.error({
                         title: 'Error',
                         message: "派工单位不能为空"
+                    });
+                    return false;
+                }
+                
+                if (!this.request.data.chargerName || this.request.data.chargerName === "") {
+                    this.$notify.error({
+                        title: 'Error',
+                        message: "主负责人不能为空"
                     });
                     return false;
                 }

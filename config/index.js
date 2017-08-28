@@ -28,13 +28,13 @@ module.exports = {
     assetsSubDirectory: 'public',
     assetsPublicPath: '/',
     proxyTable: {
-      '/esrvapi': 'http://localhost',
-      '/esrvadmin': 'http://localhost',
-      '/login': 'http://localhost',
-      '/logout': 'http://localhost',
-      '/workform': 'http://localhost',
-      '/workforms':'http://localhost',
-      '/queryWorkForm':'http://localhost'
+      '/esrvapi': 'http://localhost:9090',
+      '/esrvadmin': 'http://localhost:9090',
+      '/login': 'http://localhost:9090',
+      '/logout': 'http://localhost:9090',
+      '/workform': 'http://localhost:9090',
+      '/workforms':'http://localhost:9090',
+      '/queryWorkForm':'http://localhost:9090'
     },
     // CSS Sourcemaps off by default because relative paths are "buggy"
     // with this option, according to the CSS-Loader README

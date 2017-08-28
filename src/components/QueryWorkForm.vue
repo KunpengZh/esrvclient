@@ -397,13 +397,20 @@
                     }else{
                         curObj.requestNum=1;
                     }
+
+                    if (source[i].requestwage == null || source[i].requestwage === '') {
+                        source[i].requestwage = 0;
+                    }
+
                     summary.wageNum=summary.wageNum+source[i].requestwage
                     if(curObj.wageNum){
                         curObj.wageNum=curObj.wageNum+source[i].requestwage
                     }else{
                         curObj.wageNum=source[i].requestwage
                     }
-
+                    if (source[i].workhour == null || source[i].workhour === '') {
+                        source[i].workhour = 0;
+                    }
                     summary.workhourNum=summary.workhourNum+source[i].workhour
                     if(curObj.workhourNum){
                         curObj.workhourNum=curObj.workhourNum+source[i].workhour

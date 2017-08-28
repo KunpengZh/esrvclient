@@ -1,60 +1,63 @@
 <template>
     <div>
-  <div style="height:700px; padding:20px;">
-    <el-table :data="UserDataSource" border style="width: 100%" max-height="650">
-      <el-table-column prop="username" label="用户ID" label-class-name="forcastHeader">
-      </el-table-column>
-      <el-table-column prop="fullname" label="用户全名" label-class-name="forcastHeader">
-      </el-table-column>
-      <el-table-column prop="role" label="用户角色" label-class-name="forcastHeader">
-      </el-table-column>
-      <el-table-column prop="company" label="用户公司" label-class-name="forcastHeader">
-      </el-table-column>
-      <el-table-column label="操作">
-        <template scope="scope">
-          <el-button size="small" @click="handleEdit(scope.$index, scope.row)">
-            编辑</el-button>
-          <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-  </div>
-  <div>
-    <div class="v-modal" style="z-index: 2000;" v-show="dialogFormVisible"></div>
-    <div class="el-dialog__wrapper" style="z-index: 2001;" v-show="dialogFormVisible">
-      <div id="userdialog" class="el-dialog">
-        <el-form :model="user">
-          <el-form-item label="用户ID" :label-width="formLabelWidth">
-            <el-input v-model="user.username" auto-complete="off" :disabled="isEditModel"></el-input>
-          </el-form-item>
-          <el-form-item label="用户全称" :label-width="formLabelWidth">
-            <el-input v-model="user.fullname" auto-complete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="所属公司" :label-width="formLabelWidth">
-            <el-select v-model="user.company" placeholder="请选择用户角色">
-              <el-option v-for="company in companySource" :label="company.name" :value="company.name" :key="company.name"></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="用户角色" :label-width="formLabelWidth">
-            <el-select v-model="user.role" placeholder="请选择用户角色">
-              <el-option label="管理员" value="Admin"></el-option>
-              <el-option label="普通用户" value="User"></el-option>
-              <el-option label="县局用户" value="AdminOffice"></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="用户密码" :label-width="formLabelWidth" v-show="showResetPssword">
-            <el-input v-model="user.password" auto-complete="off"></el-input>
-          </el-form-item>
-        </el-form>
-        <div slot="footer" class="dialog-footer textAlignRight">
-          <el-button type="warning" @click="showResetPssword=true" v-show="isEditModel">重置密码</el-button>
-          <el-button type="primary" @click="confirmUserDialog()" v-show="isEditModel">确 定</el-button>
-          <el-button type="primary" @click="configmCreateNewUser()" v-show="isCreateModel">保存用户</el-button>
-          <el-button @click="cancelUserDialog">取 消</el-button>
+        <div style="height:700px; padding:20px;">
+            <el-table :data="UserDataSource" border style="width: 100%" max-height="650">
+                <el-table-column prop="username" label="用户ID" label-class-name="forcastHeader">
+                </el-table-column>
+                <el-table-column prop="fullname" label="用户全名" label-class-name="forcastHeader">
+                </el-table-column>
+                <el-table-column prop="role" label="用户角色" label-class-name="forcastHeader">
+                </el-table-column>
+                <el-table-column prop="company" label="用户公司" label-class-name="forcastHeader">
+                </el-table-column>
+                <el-table-column label="操作">
+                    <template scope="scope">
+                              <el-button size="small" @click="handleEdit(scope.$index, scope.row)">
+                                编辑</el-button>
+                              <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                    </template>
+                </el-table-column>
+                </el-table>
+            </div>
+    <div>
+        <div class="v-modal" style="z-index: 2000;" v-show="dialogFormVisible"></div>
+        <div class="el-dialog__wrapper" style="z-index: 2001;" v-show="dialogFormVisible">
+        <div id="userdialog" class="el-dialog">
+            <el-form :model="user">
+            <el-form-item label="所属公司" :label-width="formLabelWidth">
+                <el-select  v-model="user.company" placeholder="请选择用户所属公司" v-on:change="handleCompanyChange">
+                <el-option v-for="company in companySource" :label="company.name" :value="company.name" :key="company.name"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="用户全称" :label-width="formLabelWidth">
+            <el-select  v-model="user.fullname" placeholder="请选择用户全名">
+                <el-option v-for="employee in employeeSource" :label="employee.name" :value="employee.name" :key="employee.name"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="用户ID" :label-width="formLabelWidth">
+                <el-input v-model="user.username" placeholder="只能输入英文字符和数字" v-on:change="handleUserIDChange" auto-complete="off" :disabled="isEditModel"></el-input>
+            </el-form-item>
+            <el-form-item label="用户角色" :label-width="formLabelWidth">
+                <el-select v-model="user.role" placeholder="请选择用户角色">
+                <el-option label="管理员" value="Admin"></el-option>
+                <el-option label="普通用户" value="User"></el-option>
+                <el-option label="县局管理员" value="AdminOffice"></el-option>
+                <el-option label="单位管理员" value="CompanyAdmin"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="用户密码" :label-width="formLabelWidth" v-show="showResetPssword">
+                <el-input v-model="user.password" auto-complete="off"></el-input>
+            </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer textAlignRight">
+            <el-button type="warning" @click="showResetPssword=true" v-show="isEditModel">重置密码</el-button>
+            <el-button type="primary" @click="confirmUserDialog()" v-show="isEditModel">确 定</el-button>
+            <el-button type="primary" @click="configmCreateNewUser()" v-show="isCreateModel">保存用户</el-button>
+            <el-button @click="cancelUserDialog">取 消</el-button>
+            </div>
         </div>
-      </div>
+        </div>
     </div>
-  </div>
 </div>
 </template>
 
@@ -62,17 +65,17 @@
     export default {
         props: ["options"],
         data() {
-            var companySource=[];
-            if(this.$store.state.configdoc.companySource && this.$store.state.configdoc.companySource.data){
-                companySource=this.$store.state.configdoc.companySource.data
+            var companySource = [];
+            if (this.$store.state.configdoc.companySource && this.$store.state.configdoc.companySource.data) {
+                companySource = this.$store.state.configdoc.companySource.data
             }
             return {
                 UserDataSource: this.options.data,
                 dialogFormVisible: false,
                 showResetPssword: false,
-                isCreateModel:false,
-                isEditModel:false,
-                menuActiveIndex:'1',
+                isCreateModel: false,
+                isEditModel: false,
+                menuActiveIndex: '1',
                 user: {
                     username: '',
                     fullname: '',
@@ -82,6 +85,8 @@
                 },
                 formLabelWidth: '120px',
                 companySource: companySource,
+                previousCompanyValue: '',
+                employeeSource: [],
                 originUser: {
                     username: '',
                     fullname: '',
@@ -92,10 +97,69 @@
             }
         },
         methods: {
+            handleUserIDChange: function(value) {
+                if (!this.validateOnlyAllowedCharts(value)) {
+                    this.$notify.error({
+                        title: 'Error',
+                        message: "用户ID只能是字母和数字和组合,不能有中文字符"
+                    });
+                    this.$set(this.user, 'username', "");
+                }
+            },
+            validateOnlyAllowedCharts(text) {
+                let numbers = '0123456789abcdefghijklmnopqrstuvwxyz@.ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                let validate = true;
+                for (var i = 0; i < text.length && validate; i++) {
+                    if (numbers.indexOf(text[i]) < 0) {
+                        validate = false;
+                        break;
+                    }
+                }
+                return validate;
+            },
+            handleCompanyChange: function(value) {
+                var self = this;
+                if (value !== this.previousCompanyValue) {
+                    self.updateEmployeeSource(value);
+                    self.previousCompanyValue = value;
+                }
+            },
+            updateEmployeeSource: function(value) {
+                var companyAdmin = this.$store.state.configdoc["companyAdmin"]["data"];
+                var companyEmployee = this.$store.state.configdoc["companyEmployee"]["data"];
+                var employeeSource = [];
+                for (var i = 0; i < companyAdmin.length; i++) {
+                    if (companyAdmin[i].attr === value) {
+                        let duplicate = false;
+                        for (var k = 0; k < employeeSource.length && !duplicate; k++) {
+                            if (employeeSource[k].name === companyAdmin[i].name) {
+                                duplicate = true;
+                            }
+                        }
+                        if (!duplicate) {
+                            employeeSource.push(companyAdmin[i]);
+                        }
+                    }
+                }
+                for (var i = 0; i < companyEmployee.length; i++) {
+                    if (companyEmployee[i].attr === value) {
+                        let duplicate = false;
+                        for (var k = 0; k < employeeSource.length && !duplicate; k++) {
+                            if (employeeSource[k].name === companyEmployee[i].name) {
+                                duplicate = true;
+                            }
+                        }
+                        if (!duplicate) {
+                            employeeSource.push(companyEmployee[i]);
+                        }
+                    }
+                }
+                this.$set(this, 'employeeSource', employeeSource);
+            },
             handleEdit: function(index, row) {
-                this.isCreateModel=false,
-                this.isEditModel=true,
-                this.dialogFormVisible = true;
+                this.isCreateModel = false,
+                    this.isEditModel = true,
+                    this.dialogFormVisible = true;
                 this.showResetPssword = false;
                 this.user.username = row.username;
                 this.user.fullname = row.fullname ? row.fullname : row.username;
@@ -143,64 +207,66 @@
                     }
                 })
             },
-            configmCreateNewUser:function(){
-                if(this.user.username==="" ||this.user.username.length<6 ){
+            configmCreateNewUser: function() {
+                if (this.user.username === "" || this.user.username.length < 6) {
                     this.$notify.error({
-                            title: 'Error',
-                            message: '请填入用户登陆ID,不能少于6位'
+                        title: 'Error',
+                        message: '请填入用户登陆ID,不能少于6位'
                     });
                     return;
                 }
-                if(this.user.fullname===""){
+                if (this.user.fullname === "") {
                     this.$notify.error({
-                            title: 'Error',
-                            message: '请填入用户全名'
+                        title: 'Error',
+                        message: '请填入用户全名'
                     });
                     return;
                 }
-                if(this.user.role===""){
+                if (this.user.role === "") {
                     this.$notify.error({
-                            title: 'Error',
-                            message: '请填入用户角色'
+                        title: 'Error',
+                        message: '请填入用户角色'
                     });
                     return;
                 }
-                if(this.user.company===""){
+                if (this.user.company === "") {
                     this.$notify.error({
-                            title: 'Error',
-                            message: '请选择用户公司名称'
+                        title: 'Error',
+                        message: '请选择用户公司名称'
                     });
                     return;
                 }
-                if(this.user.password==="" || this.user.password.length<8){
+                if (this.user.password === "" || this.user.password.length < 8) {
                     this.$notify.error({
-                            title: 'Error',
-                            message: '请输入用户密码，最少8位'
+                        title: 'Error',
+                        message: '请输入用户密码，最少8位'
                     });
                     return;
                 }
-                var newUser={
-                    "username":this.user.username,
-                    "fullname":this.user.fullname,
-                    "company":this.user.company,
-                    "role":this.user.role,
-                    "password":this.user.password
+                var newUser = {
+                    "username": this.user.username,
+                    "fullname": this.user.fullname,
+                    "company": this.user.company,
+                    "role": this.user.role,
+                    "password": this.user.password
                 }
-                let options = { emulateJSON: true };
-                this.$http.post("/login/signup",newUser,options).then(function(res) {
-                    var result=res.body;
-                    if(!result._id && result.message){
+                let options = {
+                    emulateJSON: true
+                };
+                this.$http.post("/login/signup", newUser, options).then(function(res) {
+                    var result = res.body;
+                    if (!result._id && result.message) {
                         this.$notify.error({
                             title: 'Error',
                             message: result.message
                         });
-                    }else{
+                    } else {
                         this.UserDataSource.push(result);
-                        this.$set(this.UserDataSource,this.UserDataSource);
-                        this.isCreateModel=false,
-                        this.isEditModel=false,
-                        this.dialogFormVisible = false;
-                        this.showResetPssword=false;
+                        this.$set(this.UserDataSource, this.UserDataSource);
+                        this.isCreateModel = false,
+                            this.isEditModel = false,
+                            this.dialogFormVisible = false;
+                        this.showResetPssword = false;
                     }
                 });
             },
@@ -225,7 +291,7 @@
                     needUpdate = true;
                 }
                 if (this.user.password !== this.originUser.password) {
-                    if(this.user.password!=="" && this.user.password.length<8){
+                    if (this.user.password !== "" && this.user.password.length < 8) {
                         this.$notify.error({
                             title: 'Error',
                             message: '你输入的密码不符合最少8位的规则'
@@ -284,16 +350,16 @@
                     role: "",
                 }
             },
-            handleCreateNewUser:function(){
-                this.isCreateModel=true,
-                this.isEditModel=false,
-                this.user = {
-                    username: '',
-                    fullname: '',
-                    company: '',
-                    password: '',
-                    role: "",
-                };
+            handleCreateNewUser: function() {
+                this.isCreateModel = true,
+                    this.isEditModel = false,
+                    this.user = {
+                        username: '',
+                        fullname: '',
+                        company: '',
+                        password: '',
+                        role: "",
+                    };
                 this.originUser = {
                     username: '',
                     fullname: '',
@@ -302,7 +368,7 @@
                     role: "",
                 }
                 this.dialogFormVisible = true;
-                this.showResetPssword=true;
+                this.showResetPssword = true;
             }
         }
     }
@@ -313,6 +379,7 @@
         font-size: 14px;
         font-weight: normal;
     }
+    
     #userdialog {
         top: 10%;
         width: 600px;

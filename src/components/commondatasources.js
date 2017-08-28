@@ -3,7 +3,7 @@ export default {
     {
       "id":"0001",
       "pathname":"/createNewUser",
-      "menu":"新建用户",
+      "menu":"注册新用户",
       "event":"handleCreateNewUser"
     }
   ],
@@ -61,12 +61,12 @@ export default {
       "menu":"新建日常派工单",
       "event":"switchView"
     },
-    {
-      "id":"0002",
-      "pathname":"/createemergencyrequest",
-      "menu":"新建紧急派工单",
-      "event":"switchView"
-    }
+    // {
+    //   "id":"0002",
+    //   "pathname":"/createemergencyrequest",
+    //   "menu":"新建紧急派工单",
+    //   "event":"switchView"
+    // }
   ],
   "WorkFormDetail":[
     {
@@ -79,5 +79,6 @@ export default {
   "queryWorkform":[],
   "queryWorker":[],
   "queryMonthly":[],
-  "queryAnnually":[]
+  "queryAnnually":[],
+  "AdminRolesName":['Admin','CompanyAdmin','AdminOffice']
 }

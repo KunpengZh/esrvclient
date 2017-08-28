@@ -27,7 +27,9 @@ const vuex_store = new Vuex.Store({
       isAdmin: false,
       company: "",
       fullname: "",
-      isAuthenticated: false
+      isAuthenticated: false,
+      isCompanyAdmin: false,
+      isAdminOffice: false
     },
     configdoc: {
       companySource: [],
@@ -66,13 +68,9 @@ new Vue({
         this.$store.state.curUser.role = response.body.role;
         this.$store.state.curUser.company = response.body.company;
         this.$store.state.curUser.fullname = response.body.fullname;
-        this.$store.state.curUser.isAdmin = response.body.role==="Admin"?true:false;
-        this.$store.state.curUser.isAdminOffice = response.body.role==="AdminOffice"?true:false;
-        // if (response.body.role === "Admin") {
-        //   this.$store.state.curUser.isAdmin = true;
-        // } else {
-        //   this.$store.state.curUser.isAdmin = false;
-        // }
+        this.$store.state.curUser.isAdmin = response.body.role === "Admin" ? true : false;
+        this.$store.state.curUser.isAdminOffice = response.body.role === "AdminOffice" ? true : false;
+        this.$store.state.curUser.isCompanyAdmin = response.body.role === "CompanyAdmin" ? true : false;
         var path = window.location.pathname;
         if (path === "/") {
           this.$router.push({

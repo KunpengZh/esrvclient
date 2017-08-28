@@ -40,7 +40,7 @@
         mounted: function() {
             var self=this;
             this.$nextTick(function() {
-                if (this.$store.state.curUser.isAuthenticated) {
+                if (!this.$store.state.curUser.isAuthenticated) {
                     this.getCureUser(function(){
                         self.$http.get("/workformapi/getr").then(function(res) {
                         self.WorkFormDataSource = res.body;
@@ -69,18 +69,9 @@
                         this.$store.state.curUser.fullname = response.body.fullname;
                         this.$store.state.curUser.isAdmin = response.body.role==="Admin"?true:false;
                         this.$store.state.curUser.isAdminOffice = response.body.role==="AdminOffice"?true:false;
-                        // if (response.body.role === "Admin") {
-                        //     this.$store.state.curUser.isAdmin = true;
-                        // } else {
-                        //     this.$store.state.curUser.isAdmin = false;
-                        // }
-                        // this.$router.push({
-                        //     path: '/home'
-                        // })
                         if(callback){
                             callback();
                         }
-
                     } else {
                         this.$router.push({
                             path: '/login'
@@ -127,6 +118,8 @@
                         isSpareParts: "",
                         isSecurityTools: "",
                         sanPiaoZhiXing: "",
+                        chargerName:"",
+                        chargerID:""
                     },
                     class: "animated bounceInRight",
                     menuitems: "WorkFormDetail",
